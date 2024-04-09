@@ -3,6 +3,7 @@
 
 constexpr unsigned int CELL_SIZE = 16;
 const unsigned int FONT_SIZE = 16;
+constexpr unsigned int WALL_SIZE = 16;
 
 
 constexpr unsigned int MAP_HEIGHT = 21;
@@ -16,7 +17,20 @@ enum Cell
 {
 	Opening,
 	Empty,
-	Wall
+	Wall,
+	Pellets,
+	BigPellets
 };
 
 
+struct Position {
+
+	unsigned short int x;
+	unsigned short int y;
+
+	bool operator==(const Position& Oposition)
+	{
+		return this->x == Oposition.x && this->y == Oposition.y;
+	}
+
+};

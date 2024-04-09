@@ -1,5 +1,6 @@
 
 #include "map_creator.h"
+#include "Pacman.h"
 #include "constants.h"
 #include <string>
 #include <SFML/Graphics.hpp>
@@ -12,27 +13,53 @@ using namespace std;
 void draw_map(const std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map, sf::RenderWindow& i_window)
 {
 	
+	
 	sf::RectangleShape cell_shape(sf::Vector2f(CELL_SIZE, CELL_SIZE));
+	sf::CircleShape circle(CELL_SIZE / 2);
+	sf::RectangleShape wall_shape(sf::Vector2f(WALL_SIZE, WALL_SIZE));
 
 
-	for (unsigned char a = 0; a < MAP_WIDTH; a++)
+
+	
+	
+
+	for (unsigned int y = 0; y < MAP_WIDTH; y++)
 	{
-		for (unsigned char b = 0; b < MAP_HEIGHT; b++)
+		for (unsigned int x = 0; x < MAP_HEIGHT; x++)
 		{
-			cell_shape.setPosition(CELL_SIZE * a, CELL_SIZE * b);
-			switch (i_map[a][b])
+			cell_shape.setPosition(CELL_SIZE * y, CELL_SIZE * x);
+			wall_shape.setPosition(WALL_SIZE * y, WALL_SIZE * x);
+			switch (i_map[y][x])
 			{
 				case Cell::Wall:
 				{
-					cell_shape.setFillColor(sf::Color(36, 36, 255));
-					i_window.draw(cell_shape);
+					wall_shape.setFillColor(sf::Color(0, 0, 250));
+					i_window.draw(wall_shape);
 					break;
 				}
 				case Cell::Opening:
 				{
 					cell_shape.setFillColor(sf::Color(250, 250, 0));
 					i_window.draw(cell_shape);
+					break;
 				}
+				case Cell::Pellets:
+				{
+					circle.setFillColor(sf::Color(250, 250, 0));
+					circle.setRadius(CELL_SIZE / 6);
+					circle.setPosition( CELL_SIZE * y + (CELL_SIZE / 2 - circle.getRadius()), CELL_SIZE* x + CELL_SIZE / 2 - circle.getRadius());
+					i_window.draw(circle);
+					break;
+				}
+				case Cell::BigPellets:
+				{
+					circle.setFillColor(sf::Color(255, 0, 0));
+					circle.setRadius(CELL_SIZE / 4);
+					circle.setPosition(CELL_SIZE * y + (CELL_SIZE / 2 - circle.getRadius()), CELL_SIZE * x + CELL_SIZE / 2 - circle.getRadius());
+					i_window.draw(circle);
+				}
+
+				
 
 			}
 
@@ -44,7 +71,7 @@ void draw_map(const std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map, 
 
 }
 
-std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH> convert_sketch(const std::array<std::string, MAP_HEIGHT>& i_map_sketch)
+std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH> convert_sketch(const std::array<std::string, MAP_HEIGHT>& i_map_sketch, Pacman& pacman)
 {
 	std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH> map_output{};
 
@@ -72,7 +99,22 @@ std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH> convert_sketch(const std::ar
 					break;
 				}
 				
+				case 'p':
+				{
+					pacman.setPosition(CELL_SIZE * x, CELL_SIZE * y);
+					break;
+				}
 				
+				case '.':
+				{
+					map_output[x][y] = Cell::Pellets;
+					break;
+				}
+				case 'O':
+				{
+					map_output[x][y] = Cell::BigPellets;
+					break;
+				}
 			}
 		}
 	}
