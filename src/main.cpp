@@ -70,6 +70,7 @@ int main()
 			
 			window.clear();
 			draw_map(map, window);
+			pacman.update();
 			pacman.draw(window);
 			window.display();
 			
