@@ -22,7 +22,7 @@ int main()
 		" ####.###.#.### #### ",
 		"    #.#.......#.#  . ",
 		"#####.#.##-##.#.#####",
-		"     ...#   #...     ",
+		"     ...#1  #...     ",
 		"#####.#.##### #.#####",
 		"    #.#.......#.#    ",
 		" ####.#.#####.#.#### ",
@@ -44,10 +44,12 @@ int main()
 	window.setView(sf::View(sf::FloatRect(0, 0, CELL_SIZE * MAP_WIDTH, FONT_SIZE + CELL_SIZE * MAP_HEIGHT)));
 
 	Pacman pacman;
+	Ghosts pinky, inky, blinky, clyde;
+	//      pink, blue, red, orange
 
 	
 
-	map = convert_sketch(sketch,pacman);
+	map = convert_sketch(sketch,pacman, pinky);
 	
 	
 			
@@ -70,8 +72,9 @@ int main()
 			
 			window.clear();
 			draw_map(map, window);
-			pacman.update();
+			pacman.update(map);
 			pacman.draw(window);
+			pinky.draw(window);
 			window.display();
 			
 		

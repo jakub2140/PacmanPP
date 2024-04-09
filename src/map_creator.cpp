@@ -1,6 +1,7 @@
 
 #include "map_creator.h"
 #include "Pacman.h"
+#include "Ghosts.h"
 #include "constants.h"
 #include <string>
 #include <SFML/Graphics.hpp>
@@ -71,7 +72,7 @@ void draw_map(const std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map, 
 
 }
 
-std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH> convert_sketch(const std::array<std::string, MAP_HEIGHT>& i_map_sketch, Pacman& pacman)
+std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH> convert_sketch(const std::array<std::string, MAP_HEIGHT>& i_map_sketch, Pacman& pacman, Ghosts& pinky)
 {
 	std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH> map_output{};
 
@@ -113,6 +114,11 @@ std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH> convert_sketch(const std::ar
 				case 'O':
 				{
 					map_output[x][y] = Cell::BigPellets;
+					break;
+				}
+				case '1':
+				{
+					pinky.setPosition(CELL_SIZE * x, CELL_SIZE * y);
 					break;
 				}
 			}
