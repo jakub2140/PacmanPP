@@ -15,6 +15,7 @@ set(SOURCES src/main.cpp
 			src/map_creator.cpp
             src/Pacman.cpp
             src/Ghosts.cpp
+            src/collision.cpp
 
 			
             
@@ -22,6 +23,7 @@ set(SOURCES src/main.cpp
 			header/map_creator.h
 			header/Pacman.h
             header/Ghosts.h
+            header/collision.h
 
 			)
 
