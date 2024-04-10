@@ -7,6 +7,7 @@
 #include <SFML/Graphics.hpp>
 #include <array>
 
+
 using namespace std;
 
 
@@ -72,7 +73,7 @@ void draw_map(const std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map, 
 
 }
 
-std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH> convert_sketch(const std::array<std::string, MAP_HEIGHT>& i_map_sketch, Pacman& pacman, Ghosts& pinky)
+std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH> convert_sketch(const std::array<std::string, MAP_HEIGHT>& i_map_sketch, Pacman& pacman, Pinky& pinky, Blinky& blinky, Clyde& clyde, Inky& inky)
 {
 	std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH> map_output{};
 
@@ -119,6 +120,21 @@ std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH> convert_sketch(const std::ar
 				case '1':
 				{
 					pinky.setPosition(CELL_SIZE * x, CELL_SIZE * y);
+					break;
+				}
+				case '2':
+				{
+					inky.setPosition(CELL_SIZE * x, CELL_SIZE * y);
+					break;
+				}
+				case '3':
+				{
+					clyde.setPosition(CELL_SIZE * x, CELL_SIZE * y);
+					break;
+				}
+				case '4':
+				{
+					blinky.setPosition(CELL_SIZE * x, CELL_SIZE * y);
 					break;
 				}
 			}
