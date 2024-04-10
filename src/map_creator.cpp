@@ -14,16 +14,11 @@ using namespace std;
 
 void draw_map(const std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map, sf::RenderWindow& i_window)
 {
-	
-	
+
+
 	sf::RectangleShape cell_shape(sf::Vector2f(CELL_SIZE, CELL_SIZE));
 	sf::CircleShape circle(CELL_SIZE / 2);
 	sf::RectangleShape wall_shape(sf::Vector2f(WALL_SIZE, WALL_SIZE));
-
-
-
-	
-	
 
 	for (unsigned int y = 0; y < MAP_WIDTH; y++)
 	{
@@ -31,44 +26,46 @@ void draw_map(const std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map, 
 		{
 			cell_shape.setPosition(CELL_SIZE * y, CELL_SIZE * x);
 			wall_shape.setPosition(WALL_SIZE * y, WALL_SIZE * x);
-			switch (i_map[y][x])
+
+
+			if (i_map[y][x] == Cell::Wall)
 			{
-				case Cell::Wall:
-				{
-					wall_shape.setFillColor(sf::Color(0, 0, 250));
-					i_window.draw(wall_shape);
-					break;
-				}
-				case Cell::Opening:
-				{
-					cell_shape.setFillColor(sf::Color(250, 250, 0));
-					i_window.draw(cell_shape);
-					break;
-				}
-				case Cell::Pellets:
-				{
-					circle.setFillColor(sf::Color(250, 250, 0));
-					circle.setRadius(CELL_SIZE / 6);
-					circle.setPosition( CELL_SIZE * y + (CELL_SIZE / 2 - circle.getRadius()), CELL_SIZE* x + CELL_SIZE / 2 - circle.getRadius());
-					i_window.draw(circle);
-					break;
-				}
-				case Cell::BigPellets:
-				{
-					circle.setFillColor(sf::Color(255, 0, 0));
-					circle.setRadius(CELL_SIZE / 4);
-					circle.setPosition(CELL_SIZE * y + (CELL_SIZE / 2 - circle.getRadius()), CELL_SIZE * x + CELL_SIZE / 2 - circle.getRadius());
-					i_window.draw(circle);
-				}
-
-				
-
+				wall_shape.setFillColor(sf::Color(0, 0, 250));
+				i_window.draw(wall_shape);
 			}
 
-			
+			if (i_map[y][x] == Cell::Opening)
+			{
+				cell_shape.setFillColor(sf::Color(250, 250, 0));
+				i_window.draw(cell_shape);
+			}
+
+			if (i_map[y][x] == Cell::Pellets)
+			{
+				circle.setFillColor(sf::Color(250, 250, 0));
+				circle.setRadius(CELL_SIZE / 6);
+				circle.setPosition(CELL_SIZE * y + (CELL_SIZE / 2 - circle.getRadius()), CELL_SIZE * x + CELL_SIZE / 2 - circle.getRadius());
+				i_window.draw(circle);
+			}
+
+			if (i_map[y][x] == Cell::BigPellets)
+			{
+				circle.setFillColor(sf::Color(255, 0, 0));
+				circle.setRadius(CELL_SIZE / 4);
+				circle.setPosition(CELL_SIZE * y + (CELL_SIZE / 2 - circle.getRadius()), CELL_SIZE * x + CELL_SIZE / 2 - circle.getRadius());
+				i_window.draw(circle);
+			}
+
+
 		}
 
 	}
+
+
+
+
+
+
 
 
 }
@@ -83,67 +80,73 @@ std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH> convert_sketch(const std::ar
 		{
 			map_output[x][y] = Cell::Empty;
 
-			switch (i_map_sketch[y][x])
+			if (i_map_sketch[y][x] == ' ')
 			{
-				case ' ':
-				{
-					map_output[x][y] = Cell::Empty;
-					break;
-				}
-				case '#':
-				{
-					map_output[x][y] = Cell::Wall;
-					break;
-				}
-				case '-':
-				{
-					map_output[x][y] = Cell::Opening;
-					break;
-				}
-				
-				case 'p':
-				{
-					pacman.setPosition(CELL_SIZE * x, CELL_SIZE * y);
-					break;
-				}
-				
-				case '.':
-				{
-					map_output[x][y] = Cell::Pellets;
-					break;
-				}
-				case 'O':
-				{
-					map_output[x][y] = Cell::BigPellets;
-					break;
-				}
-				case '1':
-				{
-					pinky.setPosition(CELL_SIZE * x, CELL_SIZE * y);
-					break;
-				}
-				case '2':
-				{
-					inky.setPosition(CELL_SIZE * x, CELL_SIZE * y);
-					break;
-				}
-				case '3':
-				{
-					clyde.setPosition(CELL_SIZE * x, CELL_SIZE * y);
-					break;
-				}
-				case '4':
-				{
-					blinky.setPosition(CELL_SIZE * x, CELL_SIZE * y);
-					break;
-				}
+				map_output[x][y] = Cell::Empty;
+
 			}
+
+			if (i_map_sketch[y][x] == '#')
+			{
+				map_output[x][y] = Cell::Wall;
+
+			}
+
+			if (i_map_sketch[y][x] == '-')
+			{
+				map_output[x][y] = Cell::Opening;
+
+			}
+
+			if (i_map_sketch[y][x] == 'p')
+			{
+				pacman.setPosition(CELL_SIZE * x, CELL_SIZE * y);
+
+			}
+
+
+			if (i_map_sketch[y][x] == '.')
+			{
+				map_output[x][y] = Cell::Pellets;
+
+			}
+
+
+			if (i_map_sketch[y][x] == 'O')
+			{
+				map_output[x][y] = Cell::BigPellets;
+
+			}
+
+			if (i_map_sketch[y][x] == '1')
+			{
+				pinky.setPosition(CELL_SIZE * x, CELL_SIZE * y);
+
+			}
+
+			if (i_map_sketch[y][x] == '2')
+			{
+				inky.setPosition(CELL_SIZE * x, CELL_SIZE * y);
+
+			}
+
+			if (i_map_sketch[y][x] == '3')
+			{
+				clyde.setPosition(CELL_SIZE * x, CELL_SIZE * y);
+
+			}
+
+			if (i_map_sketch[y][x] == '4')
+			{
+				blinky.setPosition(CELL_SIZE * x, CELL_SIZE * y);
+
+			}
+
 		}
 	}
 
 	return map_output;
 
 }
-
 
 

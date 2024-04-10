@@ -13,7 +13,9 @@ void Pacman::draw(sf::RenderWindow& window)
 	window.draw(circle);
 
 }
-Pacman::Pacman() {
+
+Pacman::Pacman()
+{
 	powerup = false;
 	score = 0; //constructor resets his score to zero. C++ doesn't like that position isn't initialized but we do that in before he does anything
 }
@@ -22,15 +24,18 @@ void Pacman::setPosition(unsigned short int x, unsigned short int y)
 	Pposition = { x,y };
 }
 
-int Pacman::getScore() {
+int Pacman::getScore() 
+{
 	return score;
 }
 
-bool Pacman::getPowerup() {
+bool Pacman::getPowerup()
+{
 	return powerup;
 }
 
-Position Pacman::getPosition() {
+Position Pacman::getPosition()
+{
 	return Pposition;
 }
 
@@ -46,7 +51,7 @@ void Pacman::update(std::array<std::array<Cell,MAP_HEIGHT>, MAP_WIDTH>& i_map) {
 			direction = 2;
 	}
 	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
-		direction = 3;
+			direction = 3;
 	}
 	//Pac man will continue to go in the last direction pressed
 
