@@ -12,83 +12,97 @@
 
 int main()
 {
+    unsigned int lag = 0;
+
+    std::chrono::time_point<std::chrono::steady_clock> Prev_time;
     std::array<std::string, MAP_HEIGHT> sketch = {
-		" ################### ",
-		" #........#........# ",
-		" #O##.###.#.###.##O# ",
-		" #.................# ",
-		" #.##.#.#####.#.##.# ",
-		" #....#...#...#....# ",
-		" ####.###.#.### #### ",
-		"    #.#...4...#.#  . ",
-		"#####.#.##-##.#.#####",
-		"     ...#123#...     ",
-		"#####.#.##### #.#####",
-		"    #.#.......#.#    ",
-		" ####.#.#####.#.#### ",
-		" #........#........# ",
-		" #.##.###.#.###.##.# ",
-		" #O.#.....p.....#.O# ",
-		" ##.#.#.#####.#.#.## ",
-		" #....#...#...#....# ",
-		" #.######.#.######.# ",
-		" #.................# ",
-		" ################### "
-	};
+            " ################### ",
+            " #........#........# ",
+            " #O##.###.#.###.##O# ",
+            " #.................# ",
+            " #.##.#.#####.#.##.# ",
+            " #....#...#...#....# ",
+            " ####.###.#.### #### ",
+            "    #.#...4...#.#  . ",
+            "#####.#.##-##.#.#####",
+            "     ...#123#...     ",
+            "#####.#.##### #.#####",
+            "    #.#.......#.#    ",
+            " ####.#.#####.#.#### ",
+            " #........#........# ",
+            " #.##.###.#.###.##.# ",
+            " #O.#.....p.....#.O# ",
+            " ##.#.#.#####.#.#.## ",
+            " #....#...#...#....# ",
+            " #.######.#.######.# ",
+            " #.................# ",
+            " ################### "
+    };
 
-	std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH> map{};
-	
-	sf::Event event;
-	sf::RenderWindow window(sf::VideoMode(CELL_SIZE * MAP_WIDTH * SCREEN_RESIZE, (FONT_SIZE + CELL_SIZE * MAP_HEIGHT) * SCREEN_RESIZE), "Pac-Man", sf::Style::Close);
-	//Resizing the window.
-	window.setView(sf::View(sf::FloatRect(0, 0, CELL_SIZE * MAP_WIDTH, FONT_SIZE + CELL_SIZE * MAP_HEIGHT)));
-	std::shared_ptr<Pacman> pacman = nullptr;
-	pacman = std::make_shared<Pacman>();
-	
-	Pinky pinky(pacman);//pink
-	Blinky blinky(pacman, Chase, 0);//red
-	Clyde clyde(pacman);//orange
-	Inky inky(pacman);//blue
-	
+    std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH> map{};
 
-	map = convert_sketch(sketch,(*pacman), pinky, blinky,clyde, inky);
-	
-	
-			
-	while (1 == window.isOpen())
-	{
-		
-		
-			while (1 == window.pollEvent(event))
-			{
-				switch (event.type)
-				{
-					case sf::Event::Closed:
-					{
-						//Making sure the player can close the window.
-						window.close();
-					}
-				}
-			}
+    sf::Event event;
+    sf::RenderWindow window(sf::VideoMode(CELL_SIZE * MAP_WIDTH * SCREEN_RESIZE, (FONT_SIZE + CELL_SIZE * MAP_HEIGHT) * SCREEN_RESIZE), "Pac-Man", sf::Style::Close);
+    //Resizing the window.
+    window.setView(sf::View(sf::FloatRect(0, 0, CELL_SIZE * MAP_WIDTH, FONT_SIZE + CELL_SIZE * MAP_HEIGHT)));
+    std::shared_ptr<Pacman> pacman = nullptr;
+    pacman = std::make_shared<Pacman>();
 
-			
-			window.clear();
-			draw_map(map, window);
-			(*pacman).update(map);
-			blinky.update(map);
-			(*pacman).draw(window);
-			pinky.draw(window);
-			blinky.draw(window);
-			clyde.draw(window);
-			inky.draw(window);
-			window.display();
-			
-		
-	}
+    Pinky pinky(pacman);//pink
+    Blinky blinky(pacman, Chase, 0);//red
+    Clyde clyde(pacman);//orange
+    Inky inky(pacman);//blue
 
-			
 
-			
+    map = convert_sketch(sketch, (*pacman), pinky, blinky, clyde, inky);
+
+
+    Prev_time = std::chrono::steady_clock::now();
+
+    while (1 == window.isOpen())
+    {
+        unsigned delta_time = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - Prev_time).count();
+        lag += delta_time;
+        Prev_time += std::chrono::microseconds(delta_time);
+
+        while (FRAME_DURATION <= lag)
+        {
+            lag -= FRAME_DURATION;
+
+            while (1 == window.pollEvent(event))
+            {
+
+                switch (event.type)
+                {
+                case sf::Event::Closed:
+                {
+                    //Making sure the player can close the window.
+                    window.close();
+                }
+                }
+            }
+
+            if (FRAME_DURATION > lag)
+            {
+
+                window.clear();
+                draw_map(map, window);
+                (*pacman).update(map);
+                blinky.update(map);
+                (*pacman).draw(window);
+                pinky.draw(window);
+                blinky.draw(window);
+                clyde.draw(window);
+                inky.draw(window);
+                window.display();
+            }
+
+
+        }
+
+
+    }
+
 
 
 
@@ -98,4 +112,3 @@ int main()
 
     return 0;
 }
-

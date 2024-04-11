@@ -27,27 +27,30 @@ bool collides(int cellType, short myX, short myY, std::array<std::array<Cell, MA
 			x = ceil(cellX); //bottom right corner
 			y = ceil(cellY);
 		}
-		if (!gateOpen) {
-			if (Wall == cellType) {
-				if ((i_map[x][y] == cellType) || (i_map[x][y] == Opening)) {
-					output = true;
+		if (!((cellX <= 0 || cellY <= 0) || (cellX > MAP_WIDTH || cellY > MAP_HEIGHT))) { //checks if inside map
+			if (gateOpen == false) {
+				if (Wall == cellType) {
+					if ((i_map[x][y] == cellType) || (i_map[x][y] == Opening)) {
+						output = true;
+					}
+				}
+				else if (Pellets == cellType) {
+					if (i_map[x][y] == cellType) {
+						output = true;
+							i_map[x][y] = Empty; //removes pellet
+					}
 				}
 			}
-			if (Pellets == cellType) {
-				if (i_map[x][y] == cellType) {
-					output = true;
-					i_map[x][y] = Empty; //removes pellet
+			else {
+				if (Wall == cellType) {
+					if (i_map[x][y] == cellType) {//Checks for whatever cell type: its an enumeration so it resolves to an int
+						output = true;
+					}
 				}
-			}
-		}
-		else {
-			if (Wall == cellType) {
-				if (i_map[x][y] == cellType) {//Checks for whatever cell type: its an enumeration so it resolves to an int
-					output = true;
-				}
-			}
 
+			}
 		}
+		
 	}
 
 	return output;

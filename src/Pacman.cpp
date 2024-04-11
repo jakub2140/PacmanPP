@@ -19,7 +19,7 @@ Pacman::Pacman()
 	powerup = false;
 	score = 0; //constructor resets his score to zero. C++ doesn't like that position isn't initialized but we do that in before he does anything
 }
-void Pacman::setPosition(unsigned short int x, unsigned short int y)
+void Pacman::setPosition(short int x, short int y)
 {
 	Pposition = { x,y };
 }

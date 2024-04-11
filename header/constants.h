@@ -32,8 +32,8 @@ enum AIType
 
 struct Position {
 
-	unsigned short int x;
-	unsigned short int y;
+	short int x;
+	short int y;
 
 	bool operator==(const Position& Oposition)
 	{

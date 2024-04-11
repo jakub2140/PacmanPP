@@ -18,7 +18,7 @@ private:
 public:
 
 	virtual	void draw(sf::RenderWindow& window);
-	virtual void setPosition(unsigned short int x, unsigned short int y);
+	virtual void setPosition(short int x, short int y);
 	virtual void update(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map);
 
 };
@@ -32,7 +32,7 @@ private:
 public:
 	void draw(sf::RenderWindow& window);
 
-	void setPosition(unsigned short int x, unsigned short int y);
+	void setPosition(short int x, short int y);
 	Pinky(std::shared_ptr<Pacman> pacman) {
 		pacPointer = pacman;
 	}
@@ -50,7 +50,7 @@ private:
 public:
 	void draw(sf::RenderWindow& window);
 
-	void setPosition(unsigned short int x, unsigned short int y);
+	void setPosition(short int x, short int y);
 	Blinky(std::shared_ptr<Pacman> pacman, int ai, unsigned short startDir) {
 		pacPointer = pacman;
 		aiType = ai;
@@ -68,7 +68,7 @@ private:
 public:
 	void draw(sf::RenderWindow& window);
 
-	void setPosition(unsigned short int x, unsigned short int y);
+	void setPosition(short int x, short int y);
 	Clyde(std::shared_ptr<Pacman> pacman) {
 		pacPointer = pacman;
 	}
@@ -85,7 +85,7 @@ private:
 public:
 	void draw(sf::RenderWindow& window);
 
-	void setPosition(unsigned short int x, unsigned short int y);
+	void setPosition(short int x, short int y);
 	Inky(std::shared_ptr<Pacman> pacman) {
 		pacPointer = pacman;
 	}

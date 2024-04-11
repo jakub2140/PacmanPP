@@ -29,7 +29,7 @@ void Ghosts::draw(sf::RenderWindow& window)
 	window.draw(rectangle);
 }
 
-void Ghosts::setPosition(unsigned short int x, unsigned short int y)
+void Ghosts::setPosition(short int x, short int y)
 {
 	Gposition = { x,y };
 }
@@ -58,7 +58,7 @@ void Pinky::draw(sf::RenderWindow& window)
 	window.draw(rectangle);
 }
 
-void Pinky::setPosition(unsigned short int x, unsigned short int y)
+void Pinky::setPosition(short int x, short int y)
 {
 	Pinky_position = { x,y };
 }
@@ -84,7 +84,7 @@ void Blinky::draw(sf::RenderWindow& window)
 	window.draw(rectangle);
 }
 
-void Blinky::setPosition(unsigned short int x, unsigned short int y)
+void Blinky::setPosition(short int x, short int y)
 {
 	Blinky_position = { x,y };
 }
@@ -109,7 +109,7 @@ void Blinky::update(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map) 
 void Blinky::blinkyAI(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map, int aiType) {
 	int counter = 0; //ensures that the ghost only moves if it's at an intersection
 	Position target;
-	unsigned short newDirection;
+	unsigned short newDirection = 4;
 	bool blocked[] = {0, 0, 0, 0};
 	for (int i = 0; i < 4; i++) {
 		if (i == 0) {
@@ -133,10 +133,6 @@ void Blinky::blinkyAI(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map
 			}
 		}
 	}
-	for (int i = 0; i < 4; i++) {
-		counter += blocked[i];
-	}
-
 	float targetDistance;
 	if (aiType == 0) {
 		target.x = CELL_SIZE * MAP_WIDTH;
@@ -146,89 +142,58 @@ void Blinky::blinkyAI(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map
 		target.x = Pposition.x;
 		target.y = Pposition.y;
 	}
+	float tempDistance = 10000;
 	targetDistance = sqrt(pow((target.x - Blinky_position.x),2) + pow((target.y - Blinky_position.y), 2));
-	if (counter < 2) {
-		float tempDistance = 0;
-		for (int i = 0; i < 4; i++) {
+	for (int i = 0; i < 4; i++) {
+		if((blocked[i] == false) && !(i == (2+direction)%4)) { // (2+direction)%4 is backwards
+			if (newDirection == 4) {
+				newDirection = i;
+			}
+			counter++;
 			switch (i) {
 			case 0:
-				if (!collides(Wall, Blinky_position.x + PACMAN_SPEED, Blinky_position.y, i_map, false)) {
-					tempDistance = sqrt(pow((target.x - (Blinky_position.x + PACMAN_SPEED)),2) + pow((target.y - (Blinky_position.y)), 2));
-				}
+				tempDistance = sqrt(pow(static_cast<float>((target.x - (Blinky_position.x + PACMAN_SPEED))), 2) + pow(static_cast<float>((target.y - (Blinky_position.y))), 2));
 				if (tempDistance < targetDistance) {
 					targetDistance = tempDistance;
 					newDirection = 0;
 				}
 				break;
 			case 1:
-				if (!collides(Wall, Blinky_position.x, Blinky_position.y + PACMAN_SPEED, i_map, false)) {
-					tempDistance = sqrt(pow((target.x - (Blinky_position.x)),2) + pow((target.y - (Blinky_position.y + PACMAN_SPEED)),2));
-				}
+				tempDistance = sqrt(pow(static_cast<float>((target.x - (Blinky_position.x))), 2) + pow(static_cast<float>((target.y - (Blinky_position.y + PACMAN_SPEED))), 2));
 				if (tempDistance < targetDistance) {
 					targetDistance = tempDistance;
 					newDirection = 1;
 				}
 				break;
 			case 2:
-				if (!collides(Wall, Blinky_position.x - PACMAN_SPEED, Blinky_position.y, i_map, false)) {
-					tempDistance = sqrt(pow((target.x - (Blinky_position.x - PACMAN_SPEED)), 2) + pow((target.y - (Blinky_position.y)), 2));
-				}
+				tempDistance = sqrt(pow((static_cast<float>(target.x - (Blinky_position.x - PACMAN_SPEED))), 2) + pow(static_cast<float>((target.y - (Blinky_position.y))), 2));
 				if (tempDistance < targetDistance) {
 					targetDistance = tempDistance;
 					newDirection = 2;
 				}
 				break;
 			case 3:
-				if (!collides(Wall, Blinky_position.x, Blinky_position.y - PACMAN_SPEED, i_map, false)) {
-					tempDistance = sqrt(pow((target.x - (Blinky_position.x)), 2) + pow((target.y - (Blinky_position.y + PACMAN_SPEED)), 2));
-				}
+				tempDistance = sqrt(pow(static_cast<float>((target.x - (Blinky_position.x))), 2) + pow(static_cast<float>((target.y - (Blinky_position.y - PACMAN_SPEED))), 2));
 				if (tempDistance < targetDistance) {
 					targetDistance = tempDistance;
 					newDirection = 3;
 				}
 				break;
 			}
+
 		}
+		
+	}
+	if (1 < counter) {
 		direction = newDirection;
 	}
 	else {
-		if (direction == 0) {
-			if (collides(Wall, Blinky_position.x + PACMAN_SPEED, Blinky_position.y, i_map, false)) {
-				for (int i = 0; i < 4; i++) {
-					if ((blocked[i] == 0) && !(i = direction)) {
-						direction = i;
-					}
-				}
-			}
+		if (newDirection == 4) {
+			direction = (direction + 2) % 4;
 		}
-		else if (direction == 1) {
-			if (collides(Wall, Blinky_position.x, Blinky_position.y + PACMAN_SPEED, i_map, false)) {
-				for (int i = 0; i < 4; i++) {
-					if ((blocked[i] == 0) && !(i = direction)) {
-						direction = i;
-					}
-				}
-			}
+		else {
+			direction = newDirection;
 		}
-		else if (direction == 2) {
-			if (collides(Wall, Blinky_position.x - PACMAN_SPEED, Blinky_position.y, i_map, false)) {
-				for (int i = 0; i < 4; i++) {
-					if ((blocked[i] == 0) && !(i = direction)) {
-						direction = i;
-					}
-				}
-			}
-		}
-		else if (direction == 3) {
-			if (collides(Wall, Blinky_position.x + PACMAN_SPEED, Blinky_position.y - PACMAN_SPEED, i_map, false)) {
-				for (int i = 0; i < 4; i++) {
-					if ((blocked[i] == 0) && !(i = direction)) {
-						direction = i;
-					}
-				}
-			}
-		}
-		//std::cout << direction;
 	}
 }
 
@@ -251,7 +216,7 @@ void Clyde::draw(sf::RenderWindow& window)
 	window.draw(rectangle);
 }
 
-void Clyde::setPosition(unsigned short int x, unsigned short int y)
+void Clyde::setPosition(short int x, short int y)
 {
 	Clyde_position = { x,y };
 }
@@ -275,7 +240,7 @@ void Inky::draw(sf::RenderWindow& window)
 	window.draw(rectangle);
 }
 
-void Inky::setPosition(unsigned short int x, unsigned short int y)
+void Inky::setPosition(short int x, short int y)
 {
 	Inky_position = { x,y };
 }
