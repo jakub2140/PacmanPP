@@ -61,6 +61,10 @@ void Pacman::update(std::array<std::array<Cell,MAP_HEIGHT>, MAP_WIDTH>& i_map) {
 	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
 			direction = 3;
 	}
+	else
+	{
+		direction = 4;
+	}
 	//Pac man will continue to go in the last direction pressed
 
 	//Moves PacMan based on the current direction, but checks for collisions
@@ -92,12 +96,15 @@ void Pacman::update(std::array<std::array<Cell,MAP_HEIGHT>, MAP_WIDTH>& i_map) {
 		std::cout << "Score is: " << score;
 	}
 	// broken
-	if (CELL_SIZE >= Pposition.x) {
-		Pposition.x = CELL_SIZE * MAP_WIDTH - PACMAN_SPEED;
-	 }
-	else if (CELL_SIZE * MAP_WIDTH <= Pposition.x) {
-		Pposition.x = PACMAN_SPEED - CELL_SIZE;
+	if (Pposition.x >= CELL_SIZE * 20)
+	{
+		Pposition.x = 6;
 	}
+	else if (Pposition.x < 5)
+	{
+		Pposition.x = 319;
+	}
+
 }
 
 void Pacman::die() {
