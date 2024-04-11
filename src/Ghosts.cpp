@@ -114,7 +114,6 @@ void Blinky::update(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map) 
 void Blinky::blinkyAI(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map, int aiType) {
 	int counter = 0; //ensures that the ghost only moves if it's at an intersection
 	Position target;
-	unsigned short newDirection = 4;
 	bool blocked[] = {0, 0, 0, 0};
 	for (int i = 0; i < 4; i++) {
 		if (i == 0) {
@@ -141,63 +140,66 @@ void Blinky::blinkyAI(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map
 	float targetDistance;
 	if (aiType == 0) {
 		target.x = CELL_SIZE * MAP_WIDTH;
-		target.y = CELL_SIZE * MAP_HEIGHT;
+		target.y = 0;
 	}
 	if (aiType == 1) {
 		target.x = Pposition.x;
 		target.y = Pposition.y;
 	}
-	float tempDistance = 10000; //large number so it is guaranteed to fire
-	targetDistance = sqrt(pow(static_cast<float>((target.x - Blinky_position.x)),2) + pow(static_cast<float>((target.y - Blinky_position.y)), 2));
-	for (int i = 0; i < 4; i++) {
-		if((blocked[i] == false) && !(i == (2+direction)%4)) { // (2+direction)%4 is backwards
-			if (newDirection == 4) {
-				newDirection = i;
-			}
-			counter++;
-			switch (i) {
-			case 0:
-				tempDistance = sqrt(pow(static_cast<float>((target.x - (Blinky_position.x + PACMAN_SPEED))), 2) + pow(static_cast<float>((target.y - (Blinky_position.y))), 2));
-				if (tempDistance < targetDistance) {
-					targetDistance = tempDistance;
-					newDirection = 0;
+	if ((*pacPointer).getPowerup() == false) {
+		unsigned short newDirection = 4;
+		float tempDistance = 10000; //large number so it is guaranteed to fire
+		targetDistance = sqrt(pow(static_cast<float>((target.x - Blinky_position.x)), 2) + pow(static_cast<float>((target.y - Blinky_position.y)), 2));
+		for (int i = 0; i < 4; i++) {
+			if ((blocked[i] == false) && !(i == (2 + direction) % 4)) { // (2+direction)%4 is backwards
+				if (newDirection == 4) {
+					newDirection = i;
 				}
-				break;
-			case 1:
-				tempDistance = sqrt(pow(static_cast<float>((target.x - (Blinky_position.x))), 2) + pow(static_cast<float>((target.y - (Blinky_position.y + PACMAN_SPEED))), 2));
-				if (tempDistance < targetDistance) {
-					targetDistance = tempDistance;
-					newDirection = 1;
+				counter++;
+				switch (i) {
+				case 0:
+					tempDistance = sqrt(pow(static_cast<float>((target.x - (Blinky_position.x + PACMAN_SPEED))), 2) + pow(static_cast<float>((target.y - (Blinky_position.y))), 2));
+					if (tempDistance < targetDistance) {
+						targetDistance = tempDistance;
+						newDirection = 0;
+					}
+					break;
+				case 1:
+					tempDistance = sqrt(pow(static_cast<float>((target.x - (Blinky_position.x))), 2) + pow(static_cast<float>((target.y - (Blinky_position.y + PACMAN_SPEED))), 2));
+					if (tempDistance < targetDistance) {
+						targetDistance = tempDistance;
+						newDirection = 1;
+					}
+					break;
+				case 2:
+					tempDistance = sqrt(pow((static_cast<float>(target.x - (Blinky_position.x - PACMAN_SPEED))), 2) + pow(static_cast<float>((target.y - (Blinky_position.y))), 2));
+					if (tempDistance < targetDistance) {
+						targetDistance = tempDistance;
+						newDirection = 2;
+					}
+					break;
+				case 3:
+					tempDistance = sqrt(pow(static_cast<float>((target.x - (Blinky_position.x))), 2) + pow(static_cast<float>((target.y - (Blinky_position.y - PACMAN_SPEED))), 2));
+					if (tempDistance < targetDistance) {
+						targetDistance = tempDistance;
+						newDirection = 3;
+					}
+					break;
 				}
-				break;
-			case 2:
-				tempDistance = sqrt(pow((static_cast<float>(target.x - (Blinky_position.x - PACMAN_SPEED))), 2) + pow(static_cast<float>((target.y - (Blinky_position.y))), 2));
-				if (tempDistance < targetDistance) {
-					targetDistance = tempDistance;
-					newDirection = 2;
-				}
-				break;
-			case 3:
-				tempDistance = sqrt(pow(static_cast<float>((target.x - (Blinky_position.x))), 2) + pow(static_cast<float>((target.y - (Blinky_position.y - PACMAN_SPEED))), 2));
-				if (tempDistance < targetDistance) {
-					targetDistance = tempDistance;
-					newDirection = 3;
-				}
-				break;
+
 			}
 
 		}
-		
-	}
-	if (1 < counter) {
-		direction = newDirection;
-	}
-	else {
-		if (newDirection == 4) {
-			direction = (direction + 2) % 4;
+		if (1 < counter) {
+			direction = newDirection;
 		}
 		else {
-			direction = newDirection;
+			if (newDirection == 4) {
+				direction = (direction + 2) % 4;
+			}
+			else {
+				direction = newDirection;
+			}
 		}
 	}
 }

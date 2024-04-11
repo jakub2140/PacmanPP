@@ -20,7 +20,7 @@ Pacman::Pacman()
 {
 	powerup = false;
 	alive = true;
-	score = 0; //constructor resets his score to zero. C++ doesn't like that position isn't initialized but we do that in before he does anything
+	score = 0; //constructor resets his score to zero. C++ doesn't like that position isn't initialized but we do that before he does anything
 }
 void Pacman::setPosition(short int x, short int y)
 {
@@ -50,16 +50,24 @@ bool Pacman::getAlive()
 void Pacman::update(std::array<std::array<Cell,MAP_HEIGHT>, MAP_WIDTH>& i_map) {
 	//Determines which direction Pacman is going based on key presses
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
-			direction = 0;
+			if (!collides(Wall, Pposition.x + PACMAN_SPEED, Pposition.y, i_map, false)) {
+				direction = 0;
+			}
 	}
 	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
-			direction = 1;
+			if (!collides(Wall, Pposition.x, Pposition.y + PACMAN_SPEED, i_map, false)) {
+				direction = 1;
+			}
 	}
 	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
-			direction = 2;
+			if (!collides(Wall, Pposition.x - PACMAN_SPEED, Pposition.y, i_map, false)) {
+				direction = 2;
+			}
 	}
 	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
-			direction = 3;
+			if (!collides(Wall, Pposition.x, Pposition.y - PACMAN_SPEED, i_map, false)) {
+				direction = 3;
+			}
 	}
 	//Pac man will continue to go in the last direction pressed
 
