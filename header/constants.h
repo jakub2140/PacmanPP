@@ -23,6 +23,12 @@ enum Cell
 	BigPellets
 };
 
+enum AIType
+{
+	Scatter,
+	Chase,
+	Frightened
+};
 
 struct Position {
 

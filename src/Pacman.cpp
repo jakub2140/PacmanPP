@@ -52,28 +52,28 @@ void Pacman::update(std::array<std::array<Cell,MAP_HEIGHT>, MAP_WIDTH>& i_map) {
 
 	//Moves PacMan based on the current direction, but checks for collisions
 	if (direction == 0) {
-		if (!collides(Wall, Pposition.x + PACMAN_SPEED, Pposition.y, i_map)) {
+		if (!collides(Wall, Pposition.x + PACMAN_SPEED, Pposition.y, i_map, false)) {
 			Pposition.x += PACMAN_SPEED;
 		}
 	}
 	else if (direction == 1) {
-		if (!collides(Wall, Pposition.x, Pposition.y + PACMAN_SPEED, i_map)) {
+		if (!collides(Wall, Pposition.x, Pposition.y + PACMAN_SPEED, i_map, false)) {
 			Pposition.y += PACMAN_SPEED;
 		}
 	}
 	else if (direction == 2) {
-		if (!collides(Wall, Pposition.x - PACMAN_SPEED, Pposition.y, i_map)) {
+		if (!collides(Wall, Pposition.x - PACMAN_SPEED, Pposition.y, i_map, false)) {
 			Pposition.x -= PACMAN_SPEED;
 		}
 	}
 	else if (direction == 3) {
-		if (!collides(Wall, Pposition.x, Pposition.y-PACMAN_SPEED, i_map)) {
+		if (!collides(Wall, Pposition.x, Pposition.y-PACMAN_SPEED, i_map, false)) {
 			Pposition.y -= PACMAN_SPEED;
 		}
 	}
 
 	//Checks to see if PacMan is colliding with a pellet
-	if (collides(Pellets, Pposition.x, Pposition.y, i_map)) {
+	if (collides(Pellets, Pposition.x, Pposition.y, i_map, false)) {
 		score += 10;
 	}
 }

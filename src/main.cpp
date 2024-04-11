@@ -42,16 +42,16 @@ int main()
 	sf::RenderWindow window(sf::VideoMode(CELL_SIZE * MAP_WIDTH * SCREEN_RESIZE, (FONT_SIZE + CELL_SIZE * MAP_HEIGHT) * SCREEN_RESIZE), "Pac-Man", sf::Style::Close);
 	//Resizing the window.
 	window.setView(sf::View(sf::FloatRect(0, 0, CELL_SIZE * MAP_WIDTH, FONT_SIZE + CELL_SIZE * MAP_HEIGHT)));
-
-	Pacman pacman;
+	std::shared_ptr<Pacman> pacman = nullptr;
+	pacman = std::make_shared<Pacman>();
 	
-	Pinky pinky;//pink
-	Blinky blinky;//red
-	Clyde clyde;//orange
-	Inky inky;//blue
+	Pinky pinky(pacman);//pink
+	Blinky blinky(pacman, Chase, 0);//red
+	Clyde clyde(pacman);//orange
+	Inky inky(pacman);//blue
 	
 
-	map = convert_sketch(sketch,pacman, pinky, blinky,clyde, inky);
+	map = convert_sketch(sketch,(*pacman), pinky, blinky,clyde, inky);
 	
 	
 			
@@ -74,8 +74,9 @@ int main()
 			
 			window.clear();
 			draw_map(map, window);
-			pacman.update(map);
-			pacman.draw(window);
+			(*pacman).update(map);
+			blinky.update(map);
+			(*pacman).draw(window);
 			pinky.draw(window);
 			blinky.draw(window);
 			clyde.draw(window);

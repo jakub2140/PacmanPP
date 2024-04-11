@@ -1,5 +1,6 @@
 #pragma once
-
+#include <array>
+#include"SFML/Graphics.hpp"
 
 
 
@@ -10,6 +11,7 @@ private:
 	Position Pposition;
 	unsigned int direction;
 	unsigned int score;
+	bool powerup;
 	
 
 public:
@@ -17,6 +19,8 @@ public:
 	void setPosition(unsigned short int i_x, unsigned short int i_y);
 	void update(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map);
 	int getScore();
+	bool getPowerup();
+	Position getPosition();
 	Pacman();
 	
 };
