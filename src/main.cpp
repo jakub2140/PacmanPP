@@ -84,23 +84,20 @@ int main()
 
             if (FRAME_DURATION > lag)
             {
-
-                window.clear();
-                draw_map(map, window);
-                (*pacman).update(map);
-                blinky.update(map);
-                (*pacman).draw(window);
-                pinky.draw(window);
-                blinky.draw(window);
-                clyde.draw(window);
-                inky.draw(window);
-                window.display();
+                if((*pacman).getAlive()) {
+                    window.clear();
+                    draw_map(map, window);
+                    (*pacman).update(map);
+                    blinky.update(map);
+                    (*pacman).draw(window);
+                    pinky.draw(window);
+                    blinky.draw(window);
+                    clyde.draw(window);
+                    inky.draw(window);
+                    window.display();
+                }
             }
-
-
         }
-
-
     }
 
 

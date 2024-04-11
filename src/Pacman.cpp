@@ -2,6 +2,8 @@
 #include "constants.h"
 #include "Pacman.h"
 #include "collision.h"
+#include <iostream>
+#include <fstream>
 
 
 void Pacman::draw(sf::RenderWindow& window)
@@ -17,6 +19,7 @@ void Pacman::draw(sf::RenderWindow& window)
 Pacman::Pacman()
 {
 	powerup = false;
+	alive = true;
 	score = 0; //constructor resets his score to zero. C++ doesn't like that position isn't initialized but we do that in before he does anything
 }
 void Pacman::setPosition(short int x, short int y)
@@ -37,6 +40,11 @@ bool Pacman::getPowerup()
 Position Pacman::getPosition()
 {
 	return Pposition;
+}
+
+bool Pacman::getAlive() 
+{
+	return alive;
 }
 
 void Pacman::update(std::array<std::array<Cell,MAP_HEIGHT>, MAP_WIDTH>& i_map) {
@@ -80,6 +88,8 @@ void Pacman::update(std::array<std::array<Cell,MAP_HEIGHT>, MAP_WIDTH>& i_map) {
 	//Checks to see if PacMan is colliding with a pellet
 	if (collides(Pellets, Pposition.x, Pposition.y, i_map, false)) {
 		score += 10;
+		system("CLS");
+		std::cout << "Score is: " << score;
 	}
 	// broken
 	if (CELL_SIZE >= Pposition.x) {
@@ -88,4 +98,12 @@ void Pacman::update(std::array<std::array<Cell,MAP_HEIGHT>, MAP_WIDTH>& i_map) {
 	else if (CELL_SIZE * MAP_WIDTH <= Pposition.x) {
 		Pposition.x = PACMAN_SPEED - CELL_SIZE;
 	}
+}
+
+void Pacman::die() {
+	alive = false;
+	system("CLS");
+	std::cout << "Your score was " << score << std::endl;
+	std::ofstream outfile("Score.txt", std::ios::app);
+	outfile << "High score: " << score << std::endl;
 }

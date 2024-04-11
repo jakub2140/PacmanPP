@@ -11,7 +11,7 @@ private:
 	Position Pposition;
 	unsigned int direction;
 	unsigned int score;
-	bool powerup;
+	bool powerup, alive;
 	
 
 public:
@@ -22,5 +22,7 @@ public:
 	bool getPowerup();
 	Position getPosition();
 	Pacman();
+	void die();
+	bool getAlive();
 	
 };

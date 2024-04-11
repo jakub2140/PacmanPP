@@ -20,6 +20,7 @@ public:
 	virtual	void draw(sf::RenderWindow& window);
 	virtual void setPosition(short int x, short int y);
 	virtual void update(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map);
+	virtual void collidePacman();
 
 };
 
@@ -58,6 +59,7 @@ public:
 	}
 	void update(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map);
 	void blinkyAI(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map, int aiType);
+	void collidePacman();
 };
 
 class Clyde :public Ghosts

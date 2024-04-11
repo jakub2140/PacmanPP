@@ -38,6 +38,10 @@ void Ghosts::update(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map) 
 	Pposition = (*pacPointer).getPosition();
 }
 
+void Ghosts::collidePacman() {
+
+}
+
 
 void Pinky::draw(sf::RenderWindow& window)
 {
@@ -104,6 +108,7 @@ void Blinky::update(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map) 
 	else if (direction == 3) {
 		Blinky_position.y -= PACMAN_SPEED;
 	}
+	collidePacman();
 }
 
 void Blinky::blinkyAI(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map, int aiType) {
@@ -194,6 +199,14 @@ void Blinky::blinkyAI(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map
 		else {
 			direction = newDirection;
 		}
+	}
+}
+
+void Blinky::collidePacman() {
+	float distance = sqrt(pow(static_cast<float>(Pposition.x - Blinky_position.x), 2) + pow(static_cast<float>(Pposition.y - Blinky_position.y), 2));
+	if (distance < 10) {
+		(*pacPointer).die();
+		std::cout << "Blinky killed you. Game over";
 	}
 }
 
