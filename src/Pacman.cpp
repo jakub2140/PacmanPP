@@ -12,6 +12,15 @@ void Pacman::draw(sf::RenderWindow& window)
 	circle.setFillColor(sf::Color(250, 250, 0));
 	circle.setPosition(Pposition.x, Pposition.y);
 
+	if (alive == false)
+	{
+
+		
+		circle.setFillColor(sf::Color(250, 0, 0));
+		circle.setPosition(Pposition.x, Pposition.y);
+
+	}
+
 	window.draw(circle);
 
 }

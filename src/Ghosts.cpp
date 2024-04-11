@@ -74,9 +74,11 @@ void Blinky::draw(sf::RenderWindow& window)
 	sf::CircleShape circle(CELL_SIZE / 2);
 	sf::RectangleShape rectangle(sf::Vector2(16.f, 7.f));
 	if ((*pacPointer).getPowerup() == true) {
-		circle.setFillColor(sf::Color(0, 0, 200));
+		
+		
+		circle.setFillColor(sf::Color(0, 0, 255));
 		circle.setPosition(Blinky_position.x, Blinky_position.y);
-		rectangle.setFillColor(sf::Color(0, 0, 200));
+		rectangle.setFillColor(sf::Color(0, 0, 255));
 		rectangle.setPosition(Blinky_position.x, Blinky_position.y + CELL_SIZE / 2);
 	}
 	else {
@@ -143,6 +145,7 @@ void Blinky::blinkyAI(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map
 		target.x = Pposition.x;
 		target.y = Pposition.y;
 	}
+
 	if ((*pacPointer).getPowerup() == false) { //Normal ai
 		unsigned short newDirection = 4;
 		float tempDistance; //large number so it is guaranteed to fire
@@ -198,6 +201,8 @@ void Blinky::blinkyAI(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map
 			}
 		}
 	}
+
+
 	else { //Scared ai
 
 		unsigned short newDirection = 0;

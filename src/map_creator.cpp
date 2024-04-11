@@ -30,7 +30,7 @@ void draw_map(const std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map, 
 
 			if (i_map[y][x] == Cell::Wall)
 			{
-				wall_shape.setFillColor(sf::Color(0, 0, 250));
+				wall_shape.setFillColor(sf::Color(4, 10, 137));
 				i_window.draw(wall_shape);
 			}
 

@@ -96,6 +96,12 @@ int main()
                     inky.draw(window);
                     window.display();
                 }
+                else
+                {
+                    window.clear();
+                    (*pacman).draw(window);
+                    window.display();
+                }
             }
         }
     }
