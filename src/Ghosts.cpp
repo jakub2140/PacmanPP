@@ -142,8 +142,8 @@ void Blinky::blinkyAI(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map
 		target.x = Pposition.x;
 		target.y = Pposition.y;
 	}
-	float tempDistance = 10000;
-	targetDistance = sqrt(pow((target.x - Blinky_position.x),2) + pow((target.y - Blinky_position.y), 2));
+	float tempDistance = 10000; //large number so it is guaranteed to fire
+	targetDistance = sqrt(pow(static_cast<float>((target.x - Blinky_position.x)),2) + pow(static_cast<float>((target.y - Blinky_position.y)), 2));
 	for (int i = 0; i < 4; i++) {
 		if((blocked[i] == false) && !(i == (2+direction)%4)) { // (2+direction)%4 is backwards
 			if (newDirection == 4) {

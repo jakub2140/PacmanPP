@@ -27,7 +27,7 @@ bool collides(int cellType, short myX, short myY, std::array<std::array<Cell, MA
 			x = ceil(cellX); //bottom right corner
 			y = ceil(cellY);
 		}
-		if (!((cellX <= 0 || cellY <= 0) || (cellX > MAP_WIDTH || cellY > MAP_HEIGHT))) { //checks if inside map
+		if (!((cellX <= 0 || cellY <= 0) || (cellX >= MAP_WIDTH || cellY >= MAP_HEIGHT))) { //checks if inside map
 			if (gateOpen == false) {
 				if (Wall == cellType) {
 					if ((i_map[x][y] == cellType) || (i_map[x][y] == Opening)) {

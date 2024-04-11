@@ -81,4 +81,11 @@ void Pacman::update(std::array<std::array<Cell,MAP_HEIGHT>, MAP_WIDTH>& i_map) {
 	if (collides(Pellets, Pposition.x, Pposition.y, i_map, false)) {
 		score += 10;
 	}
+	// broken
+	if (CELL_SIZE >= Pposition.x) {
+		Pposition.x = CELL_SIZE * MAP_WIDTH - PACMAN_SPEED;
+	 }
+	else if (CELL_SIZE * MAP_WIDTH <= Pposition.x) {
+		Pposition.x = PACMAN_SPEED - CELL_SIZE;
+	}
 }
