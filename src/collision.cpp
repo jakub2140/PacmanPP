@@ -40,6 +40,12 @@ bool collides(int cellType, short myX, short myY, std::array<std::array<Cell, MA
 							i_map[x][y] = Empty; //removes pellet
 					}
 				}
+				else if (BigPellets == cellType) {
+					if (i_map[x][y] == cellType) {
+						output = true;
+						i_map[x][y] = Empty; //removes pellet
+					}
+				}
 			}
 			else {
 				if (Wall == cellType) {

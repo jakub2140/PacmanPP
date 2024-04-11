@@ -72,14 +72,21 @@ void Pinky::setPosition(short int x, short int y)
 void Blinky::draw(sf::RenderWindow& window)
 {
 	sf::CircleShape circle(CELL_SIZE / 2);
-	circle.setFillColor(sf::Color(255, 0, 0));
-	circle.setPosition(Blinky_position.x, Blinky_position.y);
-
-
 	sf::RectangleShape rectangle(sf::Vector2(16.f, 7.f));
-	rectangle.setFillColor(sf::Color(255, 0, 0));
-	rectangle.setPosition(Blinky_position.x, Blinky_position.y + CELL_SIZE / 2);
+	if ((*pacPointer).getPowerup() == true) {
+		circle.setFillColor(sf::Color(0, 0, 200));
+		circle.setPosition(Blinky_position.x, Blinky_position.y);
+		rectangle.setFillColor(sf::Color(0, 0, 200));
+		rectangle.setPosition(Blinky_position.x, Blinky_position.y + CELL_SIZE / 2);
+	}
+	else {
+		circle.setFillColor(sf::Color(255, 0, 0));
+		circle.setPosition(Blinky_position.x, Blinky_position.y);
+		rectangle.setFillColor(sf::Color(255, 0, 0));
+		rectangle.setPosition(Blinky_position.x, Blinky_position.y + CELL_SIZE / 2);
+	}
 
+	
 
 
 
@@ -108,6 +115,14 @@ void Blinky::update(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map) 
 	else if (direction == 3) {
 		Blinky_position.y -= PACMAN_SPEED;
 	}
+	if (Blinky_position.x >= CELL_SIZE * 20)
+	{
+		Blinky_position.x = 6;
+	}
+	else if (Blinky_position.x < 5)
+	{
+		Blinky_position.x = 319;
+	}
 	collidePacman();
 }
 
@@ -115,28 +130,10 @@ void Blinky::blinkyAI(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map
 	int counter = 0; //ensures that the ghost only moves if it's at an intersection
 	Position target;
 	bool blocked[] = {0, 0, 0, 0};
-	for (int i = 0; i < 4; i++) {
-		if (i == 0) {
-			if (collides(Wall, Blinky_position.x + PACMAN_SPEED, Blinky_position.y, i_map, false)) { //ghosts move at speed of pacman
-				blocked[i] = 1;
-			}
-		}
-		else if (i == 1) {
-			if (collides(Wall, Blinky_position.x, Blinky_position.y + PACMAN_SPEED, i_map, false)) {
-				blocked[i] = 1;
-			}
-		}
-		else if (i == 2) {
-			if (collides(Wall, Blinky_position.x - PACMAN_SPEED, Blinky_position.y, i_map, false)) {
-				blocked[i] = 1;
-			}
-		}
-		else if (i == 3) {
-			if (collides(Wall, Blinky_position.x, Blinky_position.y - PACMAN_SPEED, i_map, false)) {
-				blocked[i] = 1;
-			}
-		}
-	}
+	blocked[0] = collides(Wall, Blinky_position.x + PACMAN_SPEED, Blinky_position.y, i_map, false);
+	blocked[1] = collides(Wall, Blinky_position.x, Blinky_position.y + PACMAN_SPEED, i_map, false);
+	blocked[2] = collides(Wall, Blinky_position.x - PACMAN_SPEED, Blinky_position.y, i_map, false);
+	blocked[3] = collides(Wall, Blinky_position.x, Blinky_position.y - PACMAN_SPEED, i_map, false);
 	float targetDistance;
 	if (aiType == 0) {
 		target.x = CELL_SIZE * MAP_WIDTH;
@@ -146,10 +143,11 @@ void Blinky::blinkyAI(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map
 		target.x = Pposition.x;
 		target.y = Pposition.y;
 	}
-	if ((*pacPointer).getPowerup() == false) {
+	if ((*pacPointer).getPowerup() == false) { //Normal ai
 		unsigned short newDirection = 4;
-		float tempDistance = 10000; //large number so it is guaranteed to fire
+		float tempDistance; //large number so it is guaranteed to fire
 		targetDistance = sqrt(pow(static_cast<float>((target.x - Blinky_position.x)), 2) + pow(static_cast<float>((target.y - Blinky_position.y)), 2));
+		float bestDistance = 480;
 		for (int i = 0; i < 4; i++) {
 			if ((blocked[i] == false) && !(i == (2 + direction) % 4)) { // (2+direction)%4 is backwards
 				if (newDirection == 4) {
@@ -159,36 +157,34 @@ void Blinky::blinkyAI(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map
 				switch (i) {
 				case 0:
 					tempDistance = sqrt(pow(static_cast<float>((target.x - (Blinky_position.x + PACMAN_SPEED))), 2) + pow(static_cast<float>((target.y - (Blinky_position.y))), 2));
-					if (tempDistance < targetDistance) {
-						targetDistance = tempDistance;
+					if (tempDistance < bestDistance) {
+						bestDistance = tempDistance;
 						newDirection = 0;
 					}
 					break;
 				case 1:
 					tempDistance = sqrt(pow(static_cast<float>((target.x - (Blinky_position.x))), 2) + pow(static_cast<float>((target.y - (Blinky_position.y + PACMAN_SPEED))), 2));
-					if (tempDistance < targetDistance) {
-						targetDistance = tempDistance;
+					if (tempDistance < bestDistance) {
+						bestDistance = tempDistance;
 						newDirection = 1;
 					}
 					break;
 				case 2:
 					tempDistance = sqrt(pow((static_cast<float>(target.x - (Blinky_position.x - PACMAN_SPEED))), 2) + pow(static_cast<float>((target.y - (Blinky_position.y))), 2));
-					if (tempDistance < targetDistance) {
-						targetDistance = tempDistance;
+					if (tempDistance < bestDistance) {
+						bestDistance = tempDistance;
 						newDirection = 2;
 					}
 					break;
 				case 3:
 					tempDistance = sqrt(pow(static_cast<float>((target.x - (Blinky_position.x))), 2) + pow(static_cast<float>((target.y - (Blinky_position.y - PACMAN_SPEED))), 2));
-					if (tempDistance < targetDistance) {
-						targetDistance = tempDistance;
+					if (tempDistance < bestDistance) {
+						bestDistance = tempDistance;
 						newDirection = 3;
 					}
 					break;
 				}
-
 			}
-
 		}
 		if (1 < counter) {
 			direction = newDirection;
@@ -202,13 +198,33 @@ void Blinky::blinkyAI(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map
 			}
 		}
 	}
+	else { //Scared ai
+
+		unsigned short newDirection = 0;
+		for (int i = 0; i < 4; i++) {
+			if (blocked[i] == false && i != (direction + 2) % 4) {
+				if (blocked[i] == 0) {
+					counter++;
+				}
+			}
+		}
+		if (0 < counter) {
+			while ((newDirection == (direction + 2) % 4) || (blocked[newDirection] == true)) {
+				newDirection = rand() % 4;
+			}
+			direction = newDirection;
+		}
+
+	}
 }
 
 void Blinky::collidePacman() {
 	float distance = sqrt(pow(static_cast<float>(Pposition.x - Blinky_position.x), 2) + pow(static_cast<float>(Pposition.y - Blinky_position.y), 2));
-	if (distance < 10) {
-		(*pacPointer).die();
-		std::cout << "Blinky killed you. Game over";
+	if ((*pacPointer).getPowerup() == false) {
+		if (distance < 10) {
+			(*pacPointer).die();
+			std::cout << "Blinky killed you. Game over";
+		}
 	}
 }
 

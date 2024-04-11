@@ -69,10 +69,6 @@ void Pacman::update(std::array<std::array<Cell,MAP_HEIGHT>, MAP_WIDTH>& i_map) {
 				direction = 3;
 			}
 	}
-	else
-	{
-		direction = 4;
-	}
 	//Pac man will continue to go in the last direction pressed
 
 	//Moves PacMan based on the current direction, but checks for collisions
@@ -102,6 +98,10 @@ void Pacman::update(std::array<std::array<Cell,MAP_HEIGHT>, MAP_WIDTH>& i_map) {
 		score += 10;
 		system("CLS");
 		std::cout << "Score is: " << score;
+	}
+	if (collides(BigPellets, Pposition.x, Pposition.y, i_map, false)) {
+		score += 50;
+		powerup = true;
 	}
 	// broken
 	if (Pposition.x >= CELL_SIZE * 20)
