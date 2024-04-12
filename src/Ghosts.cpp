@@ -159,28 +159,28 @@ void Blinky::blinkyAI(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map
 				counter++;
 				switch (i) {
 				case 0:
-					tempDistance = sqrt(pow(static_cast<float>((target.x - (Blinky_position.x + PACMAN_SPEED))), 2) + pow(static_cast<float>((target.y - (Blinky_position.y))), 2));
+					tempDistance = sqrt(pow(static_cast<float>((target.x - (Blinky_position.x + 1))), 2) + pow(static_cast<float>((target.y - (Blinky_position.y))), 2));
 					if (tempDistance < bestDistance) {
 						bestDistance = tempDistance;
 						newDirection = 0;
 					}
 					break;
 				case 1:
-					tempDistance = sqrt(pow(static_cast<float>((target.x - (Blinky_position.x))), 2) + pow(static_cast<float>((target.y - (Blinky_position.y + PACMAN_SPEED))), 2));
+					tempDistance = sqrt(pow(static_cast<float>((target.x - (Blinky_position.x))), 2) + pow(static_cast<float>((target.y - (Blinky_position.y + 1))), 2));
 					if (tempDistance < bestDistance) {
 						bestDistance = tempDistance;
 						newDirection = 1;
 					}
 					break;
 				case 2:
-					tempDistance = sqrt(pow((static_cast<float>(target.x - (Blinky_position.x - PACMAN_SPEED))), 2) + pow(static_cast<float>((target.y - (Blinky_position.y))), 2));
+					tempDistance = sqrt(pow((static_cast<float>(target.x - (Blinky_position.x - 1))), 2) + pow(static_cast<float>((target.y - (Blinky_position.y))), 2));
 					if (tempDistance < bestDistance) {
 						bestDistance = tempDistance;
 						newDirection = 2;
 					}
 					break;
 				case 3:
-					tempDistance = sqrt(pow(static_cast<float>((target.x - (Blinky_position.x))), 2) + pow(static_cast<float>((target.y - (Blinky_position.y - PACMAN_SPEED))), 2));
+					tempDistance = sqrt(pow(static_cast<float>((target.x - (Blinky_position.x))), 2) + pow(static_cast<float>((target.y - (Blinky_position.y - 1))), 2));
 					if (tempDistance < bestDistance) {
 						bestDistance = tempDistance;
 						newDirection = 3;
