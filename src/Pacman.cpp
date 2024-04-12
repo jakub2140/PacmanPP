@@ -14,7 +14,7 @@ void Pacman::draw(sf::RenderWindow& window)
 	circle.setFillColor(sf::Color(250, 250, 0));
 	circle.setPosition(Pposition.x, Pposition.y);
 
-	if (alive == false)
+	if (alive == false) //Draws Pacman as a red circle if he is dead
 	{
 
 		
@@ -38,7 +38,7 @@ void Pacman::setPosition(short int x, short int y)
 	Pposition = { x,y };
 }
 
-int Pacman::getScore() 
+int Pacman::getScore()  //get functions for all of his data that we need in other functions
 {
 	return score;
 }
@@ -58,11 +58,11 @@ bool Pacman::getAlive()
 	return alive;
 }
 
-void Pacman::setPowerup(bool TF) {
+void Pacman::setPowerup(bool TF) { //sets Pacman's powerup
 	powerup = TF;
 }
 
-void Pacman::update(std::array<std::array<Cell,MAP_HEIGHT>, MAP_WIDTH>& i_map) {
+void Pacman::update(std::array<std::array<Cell,MAP_HEIGHT>, MAP_WIDTH>& i_map) { 
 	//Determines which direction Pacman is going based on key presses
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
 			if (!collides(Wall, Pposition.x + PACMAN_SPEED, Pposition.y, i_map, false)) {
@@ -87,6 +87,7 @@ void Pacman::update(std::array<std::array<Cell,MAP_HEIGHT>, MAP_WIDTH>& i_map) {
 	//Pac man will continue to go in the last direction pressed
 
 	//Moves PacMan based on the current direction, but checks for collisions
+	//Seems redundant but is needed to avoid edge cases where Pacman will clip thru a wall
 	if (direction == 0) {
 		if (!collides(Wall, Pposition.x + PACMAN_SPEED, Pposition.y, i_map, false)) {
 			Pposition.x += PACMAN_SPEED;
@@ -117,10 +118,10 @@ void Pacman::update(std::array<std::array<Cell,MAP_HEIGHT>, MAP_WIDTH>& i_map) {
 	if (collides(BigPellets, Pposition.x, Pposition.y, i_map, false)) {
 		score += 50;
 		powerup = true;
-		std::jthread p1(Manager::powerupTimer, this, 10);
+		std::jthread p1(Manager::powerupTimer, this, 10); //Instantiates new thread to handle powerup timer
 		p1.detach();
 	}
-	// broken
+	//Wraps around Pacman through the warp tunnel
 	if (Pposition.x >= CELL_SIZE * 20)
 	{
 		Pposition.x = 6;
@@ -132,12 +133,14 @@ void Pacman::update(std::array<std::array<Cell,MAP_HEIGHT>, MAP_WIDTH>& i_map) {
 
 }
 
-void Pacman::die() {
-	alive = false;
+void Pacman::die() { //Kills pacman and outputs score to screen and save file
+	alive = false; 
 	system("CLS");
 	std::cout << "Your score was " << score << std::endl;
-	std::ofstream outfile("Score.txt", std::ios::app);
+	std::ofstream outfile;
+	outfile.open("Score.txt", std::ios::app);
 	outfile << "High score: " << score << std::endl;
+	outfile.close();
 }
 
 void Pacman::increaseScore(int scoreInc) {

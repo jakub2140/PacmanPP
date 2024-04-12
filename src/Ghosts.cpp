@@ -9,7 +9,7 @@
 #include <iostream> //delete this after testing is done
 
 
-void Ghosts::draw(sf::RenderWindow& window)
+void Ghosts::draw(sf::RenderWindow& window) //Basic ghost drawing function, overwritten by all other things
 {
 
 	sf::CircleShape circle(CELL_SIZE / 2);
@@ -47,7 +47,7 @@ void Ghosts::setAI(int ai) {
 bool Ghosts::getActive() {
 	return 0;
 }
-
+//blank ghost virtual functions
 
 void Pinky::draw(sf::RenderWindow& window)
 {
@@ -55,23 +55,23 @@ void Pinky::draw(sf::RenderWindow& window)
 	sf::RectangleShape rectangle(sf::Vector2(16.f, 7.f));
 	rectangle.setPosition(Pinky_position.x, Pinky_position.y + CELL_SIZE / 2);
 	circle.setPosition(Pinky_position.x, Pinky_position.y);
-	if ((*pacPointer).getPowerup() == true) {
-		if (aiType == 3) {
+	if ((*pacPointer).getPowerup() == true) { //Checks if Pacman is powered up
+		if (aiType == Running) {
 			circle.setFillColor(sf::Color(255, 255, 255));
-			rectangle.setFillColor(sf::Color(255, 255, 255));
+			rectangle.setFillColor(sf::Color(255, 255, 255)); // If the ghost is running, draw white
 		}
 		else {
-			circle.setFillColor(sf::Color(0, 0, 255));
+			circle.setFillColor(sf::Color(0, 0, 255)); // If pacman powered up, draw blue
 			rectangle.setFillColor(sf::Color(0, 0, 255));
 		}
 	}
 	else {
-		if (aiType == 3) {
+		if (aiType == Running) {
 			circle.setFillColor(sf::Color(255, 255, 255));
 			rectangle.setFillColor(sf::Color(255, 255, 255));
 		}
 		else {
-			circle.setFillColor(sf::Color(255, 0, 199));
+			circle.setFillColor(sf::Color(255, 0, 199)); //Otherwise, draw pink
 			rectangle.setFillColor(sf::Color(255, 0, 199));
 		}
 
@@ -82,7 +82,7 @@ void Pinky::draw(sf::RenderWindow& window)
 
 void Pinky::setPosition(short int x, short int y)
 {
-	Pinky_position = { x,y };
+	Pinky_position = { x,y }; //used in startup function
 
 }
 
@@ -94,7 +94,7 @@ void Pinky::pinkyAI(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map, 
 	if (active == true) {
 		int counter = 0; //ensures that the ghost only moves if it's at an intersection
 		Position target;
-		bool blocked[] = { 0, 0, 0, 0 };
+		bool blocked[] = { 0, 0, 0, 0 }; //Checks if the ghost is blocked in each direction
 		blocked[0] = collides(Wall, Pinky_position.x + PACMAN_SPEED, Pinky_position.y, i_map, gatePass);
 		blocked[1] = collides(Wall, Pinky_position.x, Pinky_position.y + PACMAN_SPEED, i_map, gatePass);
 		blocked[2] = collides(Wall, Pinky_position.x - PACMAN_SPEED, Pinky_position.y, i_map, gatePass);
@@ -105,7 +105,7 @@ void Pinky::pinkyAI(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map, 
 			target.x = 0;
 			target.y = 0;
 		}
-		if (aiType == 1) {
+		if (aiType == 1) { //Pinky specific ai: Checks where Pacman is going, and tries to navigate to 4 squares infront of him
 			switch (static_cast<unsigned short>((*pacPointer).getDirection())) {
 			case 0:
 				target.x = Pposition.x + 4*CELL_SIZE;
