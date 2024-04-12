@@ -112,13 +112,13 @@ void Pacman::update(std::array<std::array<Cell,MAP_HEIGHT>, MAP_WIDTH>& i_map) {
 	if (collides(Pellets, Pposition.x, Pposition.y, i_map, false)) {
 		score += 10;
 		system("CLS");
-		std::cout << "Score is: " << score;
+		std::cout << "Score is: " << score; //Keeps track of your score on the text output window
 	}
 	if (collides(BigPellets, Pposition.x, Pposition.y, i_map, false)) {
 		score += 50;
 		powerup = true;
-		std::jthread t1(Manager::powerupTimer, this, 10);
-		t1.detach();
+		std::jthread p1(Manager::powerupTimer, this, 10);
+		p1.detach();
 	}
 	// broken
 	if (Pposition.x >= CELL_SIZE * 20)

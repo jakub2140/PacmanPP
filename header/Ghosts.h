@@ -33,7 +33,7 @@ private:
 	Position Pinky_position, Pposition;
 	std::shared_ptr<Pacman> pacPointer;
 	unsigned short direction;
-	int aiType;
+	int aiType, tempAI;
 	bool active, gatePass;
 public:
 	void draw(sf::RenderWindow& window);
@@ -41,7 +41,7 @@ public:
 	void setPosition(short int x, short int y);
 	Pinky(std::shared_ptr<Pacman> pacman, int ai, short startDir) {
 		pacPointer = pacman;
-		aiType = ai;
+		aiType = tempAI = ai;
 		direction = startDir;
 		active = false;
 		gatePass = true;
@@ -61,14 +61,14 @@ private:
 	Position Blinky_position, Pposition;
 	std::shared_ptr<Pacman> pacPointer;
 	unsigned short direction;
-	int aiType;
+	int aiType, tempAI;
 public:
 	void draw(sf::RenderWindow& window);
 
 	void setPosition(short int x, short int y);
 	Blinky(std::shared_ptr<Pacman> pacman, int ai, unsigned short startDir) {
 		pacPointer = pacman;
-		aiType = ai;
+		aiType = tempAI = ai;
 		direction = startDir;
 	}
 	void update(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map);
@@ -85,7 +85,7 @@ private:
 	std::shared_ptr<Pacman> pacPointer;
 	unsigned short direction;
 	bool active, gatePass;
-	int aiType;
+	int aiType, tempAI;
 public:
 	void draw(sf::RenderWindow& window);
 		
@@ -93,7 +93,7 @@ public:
 	Clyde(std::shared_ptr<Pacman> pacman, int ai, unsigned short startDir) {
 		pacPointer = pacman;
 		direction = startDir;
-		aiType = ai;
+		aiType = tempAI = ai;
 		gatePass = true;
 		active = false;
 	}
@@ -114,7 +114,7 @@ private:
 	Blinky* blinkyPtr;
 	unsigned short direction;
 	bool active, gatePass;
-	int aiType;
+	int aiType, tempAI;
 public:
 	void draw(sf::RenderWindow& window);
 
@@ -122,7 +122,7 @@ public:
 	Inky(std::shared_ptr<Pacman> pacman, int ai, short startdirection, Blinky* blinky) {
 		pacPointer = pacman;
 		blinkyPtr = blinky;
-		aiType = ai;
+		aiType = tempAI = ai;
 		direction = startdirection;
 		gatePass = true;
 		active = false;

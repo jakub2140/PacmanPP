@@ -24,3 +24,20 @@ void Manager::ghostRelease(Pinky* pinky, Clyde* clyde, Inky* inky, std::shared_p
 		(*clyde).activate();
 	}
 }
+
+void Manager::aiSwitch(Pinky* pinky, Clyde* clyde, Inky* inky, Blinky* blinky, std::shared_ptr<Pacman> pacman) {
+	while ((*pacman).getAlive() == true) {
+		std::cout << "Scatter mode" << std::endl;
+		(*pinky).setAI(Scatter);
+		(*inky).setAI(Scatter);
+		(*blinky).setAI(Scatter);
+		(*clyde).setAI(Scatter);
+		std::this_thread::sleep_for(std::chrono::seconds(7));
+		std::cout << "Chase mode " << std::endl;
+		(*pinky).setAI(Chase);
+		(*inky).setAI(Chase);
+		(*blinky).setAI(Chase);
+		(*clyde).setAI(Chase);
+		std::this_thread::sleep_for(std::chrono::seconds(20));
+	}
+}

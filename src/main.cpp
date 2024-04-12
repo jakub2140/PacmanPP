@@ -8,6 +8,7 @@
 #include "map_creator.h"
 #include "Pacman.h"
 #include "Manager.h"
+#include <thread>
 
 
 
@@ -52,9 +53,11 @@ int main()
 
     Pinky pinky(pacman, Chase, 0);//pink
     Blinky blinky(pacman, Chase, 0);//red
-    Clyde clyde(pacman, Chase, 0);//orange
+    Clyde clyde(pacman, Chase, 2);//orange
     Inky inky(pacman, Chase, 0, &blinky);//blue
 
+    std::jthread t1(Manager::aiSwitch, &pinky, &clyde, &inky, &blinky, pacman);
+    t1.detach();
 
     map = convert_sketch(sketch, (*pacman), pinky, blinky, clyde, inky);
 

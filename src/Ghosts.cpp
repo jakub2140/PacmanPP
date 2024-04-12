@@ -131,7 +131,7 @@ void Pinky::pinkyAI(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map, 
 			target.y = 112;
 		}
 		if (aiType == 3 && Pinky_position.x == 160 && Pinky_position.y == 112) {
-			setAI(Chase);
+			setAI(tempAI);
 			gatePass = false;
 			target.x = Pposition.x;
 			target.y = Pposition.y;
@@ -270,7 +270,15 @@ void Pinky::activate() {
 }
 
 void Pinky::setAI(int ai) {
-	aiType = ai;
+	if (aiType == Running && Pinky_position.x == 160 && Pinky_position.y == 112) {
+		aiType = ai;
+	}
+	else if (aiType == Running) {
+		tempAI = ai;
+	}
+	else {
+		aiType = ai;
+	}
 }
 
 
@@ -369,7 +377,7 @@ void Blinky::blinkyAI(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map
 		target.y = 112;
 	}
 	if (aiType == 3 && Blinky_position.x == 160 && Blinky_position.y == 112) {
-		setAI(Chase);
+		setAI(tempAI);
 		target.x = Pposition.x;
 		target.y = Pposition.y;
 	}
@@ -471,7 +479,15 @@ void Blinky::collidePacman() {
 }
 
 void Blinky::setAI(int ai) {
-	aiType = ai;
+	if (aiType == Running && Blinky_position.x == 160 && Blinky_position.y == 112) {
+		aiType = ai; //edge case for swiching out of running at the right spot
+	}
+	else if (aiType == Running) {
+		tempAI = ai;
+	}
+	else {
+		aiType = ai;
+	}
 }
 
 Position Blinky::getPosition() {
@@ -524,7 +540,15 @@ bool Clyde::getActive() {
 }
 
 void Clyde::setAI(int ai) {
-	aiType = ai;
+	if (aiType == Running && Clyde_position.x == 160 && Clyde_position.y == 112) {
+		aiType = ai; //edge case for switching out of running mode at the correct spot
+	}
+	else if (aiType == Running) {
+		tempAI = ai;
+	}
+	else {
+		aiType = ai;
+	}
 }
 
 void Clyde::update(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map) {
@@ -586,7 +610,7 @@ void Clyde::clydeAI(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map, 
 			target.y = 112;
 		}
 		if (aiType == 3 && Clyde_position.x == 160 && Clyde_position.y == 112) {
-			setAI(Chase); //need to do this to avoid overloaded definition
+			setAI(tempAI); //need to do this to avoid overloaded definition
 			gatePass = false;
 			target.x = Pposition.x;
 			target.y = Pposition.y;
@@ -736,7 +760,15 @@ void Inky::activate() {
 }
 
 void Inky::setAI(int ai) {
-	aiType = ai;
+	if (aiType == Running && Inky_position.x == 160 && Inky_position.y == 112) {
+		aiType = ai;
+	}
+	else if (aiType == Running) {
+		tempAI = ai;
+	}
+	else {
+		aiType = ai;
+	}
 }
 
 bool Inky::getActive() {
@@ -783,7 +815,7 @@ void Inky::inkyAI(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map, in
 		float targetDistance;
 		if (aiType == 0) {
 			target.x = CELL_SIZE * MAP_WIDTH;
-			target.y = 0;
+			target.y = CELL_SIZE * MAP_HEIGHT;
 		}
 		if (aiType == 1) {
 			//This is the only difference in the Inky AI: he finds a vector pointing from Blinky to Pacman, and sets his target to twice that vector
@@ -796,7 +828,7 @@ void Inky::inkyAI(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map, in
 			target.y = 112;
 		}
 		if (aiType == 3 && Inky_position.x == 160 && Inky_position.y == 112) {
-			setAI(Chase); //need to do this to avoid overloaded definition
+			setAI(tempAI); //need to do this to avoid overloaded definition
 			target.x = Pposition.x;
 			target.y = Pposition.y;
 		}
