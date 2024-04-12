@@ -14,13 +14,13 @@ void Manager::powerupTimer(Pacman* pacman, int seconds) {
 
 void Manager::ghostRelease(Pinky* pinky, Clyde* clyde, Inky* inky, std::shared_ptr<Pacman> pacman, sf::Clock* clock) {
 	sf::Time elapsed = (*clock).getElapsedTime(); //if elapsed time > 15s
-	if (elapsed.asSeconds() > 15 && (*pinky).getActive() == false) {
+	if (elapsed.asSeconds() > 10 && (*pinky).getActive() == false) {
 		(*pinky).activate();
 	}
-	if ((*pinky).getActive() == true && (*pacman).getScore() > 400) {
-		//activate Inky
+	if ((*pinky).getActive() == true && (*pacman).getScore() > 400 && (*inky).getActive() == false) {
+		(*inky).activate();
 	}
-	if ((*pinky).getActive() == true && (*inky).getActive() == true && (*pacman).getScore() > 800) {
-		//activate Clyde
+	if ((*pinky).getActive() == true && (*inky).getActive() == true && (*pacman).getScore() > 800 && (*clyde).getActive() == false) {
+		(*clyde).activate();
 	}
 }

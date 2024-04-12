@@ -31,7 +31,7 @@ set(SOURCES src/main.cpp
 
 add_executable(Pacman_plusplus ${SOURCES})
 target_link_libraries(Pacman_plusplus PRIVATE sfml-graphics)
-target_compile_features(Pacman_plusplus PRIVATE cxx_std_17)
+target_compile_features(Pacman_plusplus PRIVATE cxx_std_20)
 
 
 

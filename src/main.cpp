@@ -50,10 +50,10 @@ int main()
     std::shared_ptr<Pacman> pacman = nullptr;
     pacman = std::make_shared<Pacman>();
 
-    Pinky pinky(pacman, Running, 0);//pink
+    Pinky pinky(pacman, Chase, 0);//pink
     Blinky blinky(pacman, Chase, 0);//red
-    Clyde clyde(pacman);//orange
-    Inky inky(pacman);//blue
+    Clyde clyde(pacman, Chase, 0);//orange
+    Inky inky(pacman, Chase, 0, &blinky);//blue
 
 
     map = convert_sketch(sketch, (*pacman), pinky, blinky, clyde, inky);
@@ -93,6 +93,8 @@ int main()
                     (*pacman).update(map);
                     pinky.update(map);
                     blinky.update(map);
+                    inky.update(map);
+                    clyde.update(map);
                     (*pacman).draw(window);
                     pinky.draw(window);
                     blinky.draw(window);
@@ -109,13 +111,6 @@ int main()
             }
         }
     }
-
-
-
-
-
-
-
-
     return 0;
 }
+

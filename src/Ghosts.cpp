@@ -360,11 +360,12 @@ void Blinky::blinkyAI(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map
 		target.y = 0;
 	}
 	if (aiType == 1) {
+		//Simplest AI, it targets whereever Pacman currently is.
 		target.x = Pposition.x;
 		target.y = Pposition.y;
 	}
 	if (aiType == 3) {
-		target.x = 160;
+		target.x = 160; 
 		target.y = 112;
 	}
 	if (aiType == 3 && Blinky_position.x == 160 && Blinky_position.y == 112) {
@@ -473,21 +474,36 @@ void Blinky::setAI(int ai) {
 	aiType = ai;
 }
 
+Position Blinky::getPosition() {
+	return Blinky_position;
+}
+
 void Clyde::draw(sf::RenderWindow& window)
 {
 	sf::CircleShape circle(CELL_SIZE / 2);
-	circle.setFillColor(sf::Color(255, 131, 0));
-	circle.setPosition(Clyde_position.x, Clyde_position.y);
-
-
 	sf::RectangleShape rectangle(sf::Vector2(16.f, 7.f));
-	rectangle.setFillColor(sf::Color(255, 131, 0));
+	circle.setPosition(Clyde_position.x, Clyde_position.y);
 	rectangle.setPosition(Clyde_position.x, Clyde_position.y + CELL_SIZE / 2);
-
-
-
-
-
+	if ((*pacPointer).getPowerup() == true) {
+		if (aiType == 3) {
+			circle.setFillColor(sf::Color(255, 255, 255));
+			rectangle.setFillColor(sf::Color(255, 255, 255));
+		}
+		else {
+			circle.setFillColor(sf::Color(0, 0, 255));
+			rectangle.setFillColor(sf::Color(0, 0, 255));
+		}
+	}
+	else {
+		if (aiType == 3) {
+			circle.setFillColor(sf::Color(255, 255, 255));
+			rectangle.setFillColor(sf::Color(255, 255, 255));
+		}
+		else {
+			circle.setFillColor(sf::Color(255, 131, 0));
+			rectangle.setFillColor(sf::Color(255, 131, 0));
+		}
+	}
 	window.draw(circle);
 	window.draw(rectangle);
 }
@@ -497,19 +513,210 @@ void Clyde::setPosition(short int x, short int y)
 	Clyde_position = { x,y };
 }
 
+void Clyde::activate() {
+	active = true;
+	std::cout << "Clyde has been activated" << std::endl;
+	aiType = 3; //avoid weird edge cases from the manager setting wrong ai type
+}
+
+bool Clyde::getActive() {
+	return active;
+}
+
+void Clyde::setAI(int ai) {
+	aiType = ai;
+}
+
+void Clyde::update(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map) {
+	if (active == true) {
+		Pposition = (*pacPointer).getPosition();
+		clydeAI(i_map, aiType);
+		if (direction == 0) {
+			Clyde_position.x += PACMAN_SPEED;
+		}
+		else if (direction == 1) {
+			Clyde_position.y += PACMAN_SPEED;
+		}
+		else if (direction == 2) {
+			Clyde_position.x -= PACMAN_SPEED;
+		}
+		else if (direction == 3) {
+			Clyde_position.y -= PACMAN_SPEED;
+		}
+		if (Clyde_position.x >= CELL_SIZE * 20) //lets ghosts go through the warp tunnels
+		{
+			Clyde_position.x = 6;
+		}
+		else if (Clyde_position.x < 5)
+		{
+			Clyde_position.x = 319;
+		}
+		collidePacman();
+	}
+}
+
+void Clyde::clydeAI(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map, int aiType) {
+	if (active == true) {
+		int counter = 0; //ensures that the ghost only moves if it's at an intersection
+		Position target;
+		bool blocked[] = { 0, 0, 0, 0 };
+		blocked[0] = collides(Wall, Clyde_position.x + PACMAN_SPEED, Clyde_position.y, i_map, gatePass);
+		blocked[1] = collides(Wall, Clyde_position.x, Clyde_position.y + PACMAN_SPEED, i_map, gatePass);
+		blocked[2] = collides(Wall, Clyde_position.x - PACMAN_SPEED, Clyde_position.y, i_map, gatePass);
+		blocked[3] = collides(Wall, Clyde_position.x, Clyde_position.y - PACMAN_SPEED, i_map, gatePass);
+		float targetDistance;
+		if (aiType == 0) {
+			target.x = 0;
+			target.y = CELL_SIZE*MAP_HEIGHT;
+		}
+		if (aiType == 1) {
+			//Clydes targeting mechanism: If farther than 8 tiles from pacman, go to pacman. If closer, go to his corner of the map
+			if (sqrt(pow(static_cast<float>((Pposition.x - Clyde_position.x)), 2) + pow(static_cast<float>((Pposition.y - Clyde_position.y)), 2)) < 8*CELL_SIZE) {
+				target.x = 0;
+				target.y = CELL_SIZE * MAP_HEIGHT;
+			}
+			else {
+				target.x = Pposition.x;
+				target.y = Pposition.y;
+			}
+		
+		}
+		if (aiType == 3) {
+			target.x = 160;
+			target.y = 112;
+		}
+		if (aiType == 3 && Clyde_position.x == 160 && Clyde_position.y == 112) {
+			setAI(Chase); //need to do this to avoid overloaded definition
+			gatePass = false;
+			target.x = Pposition.x;
+			target.y = Pposition.y;
+		}
+		if ((*pacPointer).getPowerup() == false || aiType == 3) { //Normal ai, goes to designated target
+			unsigned short newDirection = 4;
+			float tempDistance; //large number so it is guaranteed to fire
+			targetDistance = sqrt(pow(static_cast<float>((target.x - Clyde_position.x)), 2) + pow(static_cast<float>((target.y - Clyde_position.y)), 2));
+			float bestDistance = 480;
+			for (int i = 0; i < 4; i++) {
+				if ((blocked[i] == false) && !(i == (2 + direction) % 4)) { // (2+direction)%4 is backwards
+					if (newDirection == 4) {
+						newDirection = i;
+					}
+					counter++;
+					switch (i) {
+					case 0:
+						tempDistance = sqrt(pow(static_cast<float>((target.x - (Clyde_position.x + 1))), 2) + pow(static_cast<float>((target.y - (Clyde_position.y))), 2));
+						if (tempDistance < bestDistance) {
+							bestDistance = tempDistance;
+							newDirection = 0;
+						}
+						break;
+					case 1:
+						tempDistance = sqrt(pow(static_cast<float>((target.x - (Clyde_position.x))), 2) + pow(static_cast<float>((target.y - (Clyde_position.y + 1))), 2));
+						if (tempDistance < bestDistance) {
+							bestDistance = tempDistance;
+							newDirection = 1;
+						}
+						break;
+					case 2:
+						tempDistance = sqrt(pow((static_cast<float>(target.x - (Clyde_position.x - 1))), 2) + pow(static_cast<float>((target.y - (Clyde_position.y))), 2));
+						if (tempDistance < bestDistance) {
+							bestDistance = tempDistance;
+							newDirection = 2;
+						}
+						break;
+					case 3:
+						tempDistance = sqrt(pow(static_cast<float>((target.x - (Clyde_position.x))), 2) + pow(static_cast<float>((target.y - (Clyde_position.y - 1))), 2));
+						if (tempDistance < bestDistance) {
+							bestDistance = tempDistance;
+							newDirection = 3;
+						}
+						break;
+					}
+				}
+			}
+			if (1 < counter) {
+				direction = newDirection;
+			}
+			else {
+				if (newDirection == 4) {
+					direction = (direction + 2) % 4;
+				}
+				else {
+					direction = newDirection;
+				}
+			}
+		}
+		else { //Scared ai
+
+			unsigned short newDirection = 0;
+			for (int i = 0; i < 4; i++) {
+				if (blocked[i] == false && i != (direction + 2) % 4) {
+					if (blocked[i] == 0) {
+						counter++;
+					}
+				}
+			}
+			if (0 < counter) {
+				while ((newDirection == (direction + 2) % 4) || (blocked[newDirection] == true)) {
+					newDirection = rand() % 4;
+				}
+				direction = newDirection;
+			}
+
+		}
+	}
+}
+
+void Clyde::collidePacman() {
+	float distance = sqrt(pow(static_cast<float>(Pposition.x - Clyde_position.x), 2) + pow(static_cast<float>(Pposition.y - Clyde_position.y), 2));
+	if ((*pacPointer).getPowerup() == false) {
+		if (distance < 10) {
+			(*pacPointer).die();
+			std::cout << "Clyde killed you. Game over";
+		}
+	}
+	else {
+		if (distance < 10) {
+			if (aiType != Running) {
+				(*pacPointer).increaseScore(200);
+			}
+			aiType = 3;
+
+		}
+	}
+}
+
 void Inky::draw(sf::RenderWindow& window)
 {
 	sf::CircleShape circle(CELL_SIZE / 2);
-	circle.setFillColor(sf::Color(0, 255, 255));
-	circle.setPosition(Inky_position.x, Inky_position.y);
-
-
 	sf::RectangleShape rectangle(sf::Vector2(16.f, 7.f));
-	rectangle.setFillColor(sf::Color(0, 255, 255));
+	circle.setPosition(Inky_position.x, Inky_position.y);
 	rectangle.setPosition(Inky_position.x, Inky_position.y + CELL_SIZE / 2);
 
 
+	if ((*pacPointer).getPowerup() == true) {
+		if (aiType == 3) {
+			circle.setFillColor(sf::Color(255, 255, 255));
+			rectangle.setFillColor(sf::Color(255, 255, 255));
+		}
+		else {
+			circle.setFillColor(sf::Color(0, 0, 255));
+			rectangle.setFillColor(sf::Color(0, 0, 255));
+		}
 
+
+	}
+	else {
+		if (aiType == 3) {
+			circle.setFillColor(sf::Color(255, 255, 255));
+			rectangle.setFillColor(sf::Color(255, 255, 255));
+		}
+		else {
+			circle.setFillColor(sf::Color(0, 255, 255));
+			rectangle.setFillColor(sf::Color(0, 255, 255));
+		}
+
+	}
 
 
 	window.draw(circle);
@@ -521,3 +728,169 @@ void Inky::setPosition(short int x, short int y)
 	Inky_position = { x,y };
 }
 
+void Inky::activate() {
+	active = true;
+	std::cout << "Inky active" << std::endl;
+	gatePass = true;
+	aiType = 3;
+}
+
+void Inky::setAI(int ai) {
+	aiType = ai;
+}
+
+bool Inky::getActive() {
+	return active;
+}
+
+void Inky::update(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map) {
+	if (active == true) {
+		Pposition = (*pacPointer).getPosition();
+		inkyAI(i_map, aiType);
+		if (direction == 0) {
+			Inky_position.x += PACMAN_SPEED;
+		}
+		else if (direction == 1) {
+			Inky_position.y += PACMAN_SPEED;
+		}
+		else if (direction == 2) {
+			Inky_position.x -= PACMAN_SPEED;
+		}
+		else if (direction == 3) {
+			Inky_position.y -= PACMAN_SPEED;
+		}
+		if (Inky_position.x >= CELL_SIZE * 20)
+		{
+			Inky_position.x = 6;
+		}
+		else if (Inky_position.x < 5)
+		{
+			Inky_position.x = 319;
+		}
+		collidePacman();
+	}
+}
+
+void Inky::inkyAI(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map, int aiType) {
+	if (active == true) {
+		int counter = 0; //ensures that the ghost only moves if it's at an intersection
+		Position target;
+		bool blocked[] = { 0, 0, 0, 0 };
+		blocked[0] = collides(Wall, Inky_position.x + PACMAN_SPEED, Inky_position.y, i_map, gatePass);
+		blocked[1] = collides(Wall, Inky_position.x, Inky_position.y + PACMAN_SPEED, i_map, gatePass);
+		blocked[2] = collides(Wall, Inky_position.x - PACMAN_SPEED, Inky_position.y, i_map, gatePass);
+		blocked[3] = collides(Wall, Inky_position.x, Inky_position.y - PACMAN_SPEED, i_map, gatePass);
+		float targetDistance;
+		if (aiType == 0) {
+			target.x = CELL_SIZE * MAP_WIDTH;
+			target.y = 0;
+		}
+		if (aiType == 1) {
+			//This is the only difference in the Inky AI: he finds a vector pointing from Blinky to Pacman, and sets his target to twice that vector
+			Bposition = (*blinkyPtr).getPosition();
+			target.x = Bposition.x + 2 * (Pposition.x - Bposition.x);
+			target.y = Bposition.y + 2 * (Pposition.y - Bposition.y);
+		}
+		if (aiType == 3) {
+			target.x = 160;
+			target.y = 112;
+		}
+		if (aiType == 3 && Inky_position.x == 160 && Inky_position.y == 112) {
+			setAI(Chase); //need to do this to avoid overloaded definition
+			target.x = Pposition.x;
+			target.y = Pposition.y;
+		}
+		if ((*pacPointer).getPowerup() == false || aiType == 3) { //Normal ai, goes to designated target
+			unsigned short newDirection = 4;
+			float tempDistance; //large number so it is guaranteed to fire
+			targetDistance = sqrt(pow(static_cast<float>((target.x - Inky_position.x)), 2) + pow(static_cast<float>((target.y - Inky_position.y)), 2));
+			float bestDistance = 480;
+			for (int i = 0; i < 4; i++) {
+				if ((blocked[i] == false) && !(i == (2 + direction) % 4)) { // (2+direction)%4 is backwards
+					if (newDirection == 4) {
+						newDirection = i;
+					}
+					counter++;
+					switch (i) {
+					case 0:
+						tempDistance = sqrt(pow(static_cast<float>((target.x - (Inky_position.x + 1))), 2) + pow(static_cast<float>((target.y - (Inky_position.y))), 2));
+						if (tempDistance < bestDistance) {
+							bestDistance = tempDistance;
+							newDirection = 0;
+						}
+						break;
+					case 1:
+						tempDistance = sqrt(pow(static_cast<float>((target.x - (Inky_position.x))), 2) + pow(static_cast<float>((target.y - (Inky_position.y + 1))), 2));
+						if (tempDistance < bestDistance) {
+							bestDistance = tempDistance;
+							newDirection = 1;
+						}
+						break;
+					case 2:
+						tempDistance = sqrt(pow((static_cast<float>(target.x - (Inky_position.x - 1))), 2) + pow(static_cast<float>((target.y - (Inky_position.y))), 2));
+						if (tempDistance < bestDistance) {
+							bestDistance = tempDistance;
+							newDirection = 2;
+						}
+						break;
+					case 3:
+						tempDistance = sqrt(pow(static_cast<float>((target.x - (Inky_position.x))), 2) + pow(static_cast<float>((target.y - (Inky_position.y - 1))), 2));
+						if (tempDistance < bestDistance) {
+							bestDistance = tempDistance;
+							newDirection = 3;
+						}
+						break;
+					}
+				}
+			}
+			if (1 < counter) {
+				direction = newDirection;
+			}
+			else {
+				if (newDirection == 4) {
+					direction = (direction + 2) % 4;
+				}
+				else {
+					direction = newDirection;
+				}
+			}
+		}
+		else { //Scared ai
+
+			unsigned short newDirection = 0;
+			for (int i = 0; i < 4; i++) {
+				if (blocked[i] == false && i != (direction + 2) % 4) {
+					if (blocked[i] == 0) {
+						counter++;
+					}
+				}
+			}
+			if (0 < counter) {
+				while ((newDirection == (direction + 2) % 4) || (blocked[newDirection] == true)) {
+					newDirection = rand() % 4;
+				}
+				direction = newDirection;
+			}
+
+		}
+	}
+}
+
+void Inky::collidePacman() {
+	float distance = sqrt(pow(static_cast<float>(Pposition.x - Inky_position.x), 2) + pow(static_cast<float>(Pposition.y - Inky_position.y), 2));
+	if ((*pacPointer).getPowerup() == false) {
+		if (distance < 10) {
+			(*pacPointer).die();
+			std::cout << "Inky killed you. Game over";
+		}
+	}
+	else {
+		if (distance < 10) {
+			if (aiType != Running) {
+				(*pacPointer).increaseScore(200);
+			}
+			aiType = 3;
+
+		}
+	}
+}
