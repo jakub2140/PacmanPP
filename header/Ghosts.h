@@ -6,7 +6,7 @@
 
 
 
-
+//base class
 class Ghosts
 {
 
@@ -26,7 +26,7 @@ public:
 
 };
 
-
+//derived classes below
 class Pinky:public Ghosts
 {
 private:
@@ -119,7 +119,7 @@ public:
 	void draw(sf::RenderWindow& window);
 
 	void setPosition(short int x, short int y);
-	Inky(std::shared_ptr<Pacman> pacman, int ai, short startdirection, Blinky* blinky) {
+	Inky(std::shared_ptr<Pacman> pacman, int ai, short startdirection, Blinky* blinky) {//inky has to be passed a pointer to blinky because of how he targets
 		pacPointer = pacman;
 		blinkyPtr = blinky;
 		aiType = tempAI = ai;

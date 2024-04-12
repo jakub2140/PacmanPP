@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 project(Pacman_plusplus LANGUAGES CXX)
+set (CMAKE_CXX_STANDARD 20)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
@@ -15,7 +16,7 @@ set(SOURCES src/main.cpp
 			src/map_creator.cpp
             src/Pacman.cpp
             src/Ghosts.cpp
-            src/collision.cpp
+           
             src/Manager.cpp
 
 			
@@ -30,7 +31,7 @@ set(SOURCES src/main.cpp
 			)
 
 add_executable(Pacman_plusplus ${SOURCES})
-target_link_libraries(Pacman_plusplus PRIVATE sfml-graphics)
+target_link_libraries(Pacman_plusplus PRIVATE sfml-graphics ${CMAKE_SOURCE_DIR}/Collision_library.lib)
 target_compile_features(Pacman_plusplus PRIVATE cxx_std_20)
 
 

@@ -18,6 +18,7 @@ int main()
     sf::Clock clock;
 
     std::chrono::time_point<std::chrono::steady_clock> Prev_time;
+   //map in ascii 
     std::array<std::string, MAP_HEIGHT> sketch = {
             " ################### ",
             " #........#........# ",
@@ -59,7 +60,7 @@ int main()
     std::jthread t1(Manager::aiSwitch, &pinky, &clyde, &inky, &blinky, pacman); //Spun off into its own thread to use sleep_for
     t1.detach();
 
-    map = convert_sketch(sketch, (*pacman), pinky, blinky, clyde, inky);
+    map = convert_sketch(sketch, (*pacman), pinky, blinky, clyde, inky);//converts map to cells
 
 
     Prev_time = std::chrono::steady_clock::now();
