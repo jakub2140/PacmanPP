@@ -7,12 +7,14 @@
 #include <string>
 #include "map_creator.h"
 #include "Pacman.h"
+#include "Manager.h"
 
 
 
 int main()
 {
     unsigned int lag = 0;
+    sf::Clock clock;
 
     std::chrono::time_point<std::chrono::steady_clock> Prev_time;
     std::array<std::string, MAP_HEIGHT> sketch = {
@@ -48,7 +50,7 @@ int main()
     std::shared_ptr<Pacman> pacman = nullptr;
     pacman = std::make_shared<Pacman>();
 
-    Pinky pinky(pacman);//pink
+    Pinky pinky(pacman, Running, 0);//pink
     Blinky blinky(pacman, Chase, 0);//red
     Clyde clyde(pacman);//orange
     Inky inky(pacman);//blue
@@ -87,7 +89,9 @@ int main()
                 if((*pacman).getAlive()) {
                     window.clear();
                     draw_map(map, window);
+                    Manager::ghostRelease(&pinky, &clyde, &inky, pacman, &clock);
                     (*pacman).update(map);
+                    pinky.update(map);
                     blinky.update(map);
                     (*pacman).draw(window);
                     pinky.draw(window);

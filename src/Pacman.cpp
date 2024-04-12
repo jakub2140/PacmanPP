@@ -4,6 +4,8 @@
 #include "collision.h"
 #include <iostream>
 #include <fstream>
+#include "Manager.h"
+#include <thread>
 
 
 void Pacman::draw(sf::RenderWindow& window)
@@ -54,6 +56,10 @@ Position Pacman::getPosition()
 bool Pacman::getAlive() 
 {
 	return alive;
+}
+
+void Pacman::setPowerup(bool TF) {
+	powerup = TF;
 }
 
 void Pacman::update(std::array<std::array<Cell,MAP_HEIGHT>, MAP_WIDTH>& i_map) {
@@ -111,6 +117,8 @@ void Pacman::update(std::array<std::array<Cell,MAP_HEIGHT>, MAP_WIDTH>& i_map) {
 	if (collides(BigPellets, Pposition.x, Pposition.y, i_map, false)) {
 		score += 50;
 		powerup = true;
+		std::jthread t1(Manager::powerupTimer, this, 10);
+		t1.detach();
 	}
 	// broken
 	if (Pposition.x >= CELL_SIZE * 20)
@@ -130,4 +138,12 @@ void Pacman::die() {
 	std::cout << "Your score was " << score << std::endl;
 	std::ofstream outfile("Score.txt", std::ios::app);
 	outfile << "High score: " << score << std::endl;
+}
+
+void Pacman::increaseScore(int scoreInc) {
+	score += scoreInc;
+}
+
+unsigned short Pacman::getDirection() {
+	return direction;
 }

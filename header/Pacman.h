@@ -24,5 +24,7 @@ public:
 	Pacman();
 	void die();
 	bool getAlive();
-	
+	void increaseScore(int scoreInc);
+	void setPowerup(bool TF);
+	unsigned short getDirection();
 };

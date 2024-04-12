@@ -21,6 +21,8 @@ public:
 	virtual void setPosition(short int x, short int y);
 	virtual void update(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map);
 	virtual void collidePacman();
+	virtual	void setAI(int ai);
+	virtual bool getActive();
 
 };
 
@@ -30,15 +32,27 @@ class Pinky:public Ghosts
 private:
 	Position Pinky_position, Pposition;
 	std::shared_ptr<Pacman> pacPointer;
+	unsigned short direction;
+	int aiType;
+	bool active, gatePass;
 public:
 	void draw(sf::RenderWindow& window);
 
 	void setPosition(short int x, short int y);
-	Pinky(std::shared_ptr<Pacman> pacman) {
+	Pinky(std::shared_ptr<Pacman> pacman, int ai, short startDir) {
 		pacPointer = pacman;
+		aiType = ai;
+		direction = startDir;
+		active = false;
+		gatePass = true;
 	}
-	//void update(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map);
-	//void pinkyAI(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map, int aiType);
+	void update(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map);
+	void pinkyAI(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map, int aiType);
+	void collidePacman();
+	void setAI(int ai);
+	void activate();
+	bool getActive();
+	
 };
 
 class Blinky :public Ghosts
@@ -60,6 +74,7 @@ public:
 	void update(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map);
 	void blinkyAI(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map, int aiType);
 	void collidePacman();
+	void setAI(int ai);
 };
 
 class Clyde :public Ghosts
@@ -69,7 +84,7 @@ private:
 	std::shared_ptr<Pacman> pacPointer;
 public:
 	void draw(sf::RenderWindow& window);
-
+		
 	void setPosition(short int x, short int y);
 	Clyde(std::shared_ptr<Pacman> pacman) {
 		pacPointer = pacman;

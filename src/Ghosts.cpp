@@ -41,23 +41,41 @@ void Ghosts::update(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map) 
 void Ghosts::collidePacman() {
 
 }
+void Ghosts::setAI(int ai) {
+
+}
+bool Ghosts::getActive() {
+	return 0;
+}
 
 
 void Pinky::draw(sf::RenderWindow& window)
 {
 	sf::CircleShape circle(CELL_SIZE / 2);
-	circle.setFillColor(sf::Color(255, 0, 199));
-	circle.setPosition(Pinky_position.x, Pinky_position.y);
-
-
 	sf::RectangleShape rectangle(sf::Vector2(16.f, 7.f));
-	rectangle.setFillColor(sf::Color(255, 0, 199));
 	rectangle.setPosition(Pinky_position.x, Pinky_position.y + CELL_SIZE / 2);
+	circle.setPosition(Pinky_position.x, Pinky_position.y);
+	if ((*pacPointer).getPowerup() == true) {
+		if (aiType == 3) {
+			circle.setFillColor(sf::Color(255, 255, 255));
+			rectangle.setFillColor(sf::Color(255, 255, 255));
+		}
+		else {
+			circle.setFillColor(sf::Color(0, 0, 255));
+			rectangle.setFillColor(sf::Color(0, 0, 255));
+		}
+	}
+	else {
+		if (aiType == 3) {
+			circle.setFillColor(sf::Color(255, 255, 255));
+			rectangle.setFillColor(sf::Color(255, 255, 255));
+		}
+		else {
+			circle.setFillColor(sf::Color(255, 0, 199));
+			rectangle.setFillColor(sf::Color(255, 0, 199));
+		}
 
-
-
-
-
+	}
 	window.draw(circle);
 	window.draw(rectangle);
 }
@@ -65,6 +83,194 @@ void Pinky::draw(sf::RenderWindow& window)
 void Pinky::setPosition(short int x, short int y)
 {
 	Pinky_position = { x,y };
+
+}
+
+bool Pinky::getActive() {
+	return active;
+}
+
+void Pinky::pinkyAI(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map, int aiType) {
+	if (active == true) {
+		int counter = 0; //ensures that the ghost only moves if it's at an intersection
+		Position target;
+		bool blocked[] = { 0, 0, 0, 0 };
+		blocked[0] = collides(Wall, Pinky_position.x + PACMAN_SPEED, Pinky_position.y, i_map, gatePass);
+		blocked[1] = collides(Wall, Pinky_position.x, Pinky_position.y + PACMAN_SPEED, i_map, gatePass);
+		blocked[2] = collides(Wall, Pinky_position.x - PACMAN_SPEED, Pinky_position.y, i_map, gatePass);
+		blocked[3] = collides(Wall, Pinky_position.x, Pinky_position.y - PACMAN_SPEED, i_map, gatePass);
+		float targetDistance;
+
+		if (aiType == 0) {
+			target.x = 0;
+			target.y = 0;
+		}
+		if (aiType == 1) {
+			switch (static_cast<unsigned short>((*pacPointer).getDirection())) {
+			case 0:
+				target.x = Pposition.x + 4*CELL_SIZE;
+				target.y = Pposition.y;
+				break;
+			case 1:
+				target.x = Pposition.x;
+				target.y = Pposition.y + 4 * CELL_SIZE;
+				break;
+			case 2:
+				target.x = Pposition.x - 4 * CELL_SIZE;
+				target.y = Pposition.y;
+				break;
+			case 3:
+				target.x = Pposition.x;
+				target.y = Pposition.y - 4 * CELL_SIZE;
+				break;
+			}
+
+		}
+		if (aiType == 3) {
+			target.x = 160;
+			target.y = 112;
+		}
+		if (aiType == 3 && Pinky_position.x == 160 && Pinky_position.y == 112) {
+			setAI(Chase);
+			gatePass = false;
+			target.x = Pposition.x;
+			target.y = Pposition.y;
+		}
+
+		if ((*pacPointer).getPowerup() == false || aiType == 3) { //Normal ai, goes to designated target
+			unsigned short newDirection = 4;
+			float tempDistance; //large number so it is guaranteed to fire
+			targetDistance = sqrt(pow(static_cast<float>((target.x - Pinky_position.x)), 2) + pow(static_cast<float>((target.y - Pinky_position.y)), 2));
+			float bestDistance = 480;
+			for (int i = 0; i < 4; i++) {
+				if ((blocked[i] == false) && !(i == (2 + direction) % 4)) { // (2+direction)%4 is backwards
+					if (newDirection == 4) {
+						newDirection = i;
+					}
+					counter++;
+					switch (i) {
+					case 0:
+						tempDistance = sqrt(pow(static_cast<float>((target.x - (Pinky_position.x + 1))), 2) + pow(static_cast<float>((target.y - (Pinky_position.y))), 2));
+						if (tempDistance < bestDistance) {
+							bestDistance = tempDistance;
+							newDirection = 0;
+						}
+						break;
+					case 1:
+						tempDistance = sqrt(pow(static_cast<float>((target.x - (Pinky_position.x))), 2) + pow(static_cast<float>((target.y - (Pinky_position.y + 1))), 2));
+						if (tempDistance < bestDistance) {
+							bestDistance = tempDistance;
+							newDirection = 1;
+						}
+						break;
+					case 2:
+						tempDistance = sqrt(pow((static_cast<float>(target.x - (Pinky_position.x - 1))), 2) + pow(static_cast<float>((target.y - (Pinky_position.y))), 2));
+						if (tempDistance < bestDistance) {
+							bestDistance = tempDistance;
+							newDirection = 2;
+						}
+						break;
+					case 3:
+						tempDistance = sqrt(pow(static_cast<float>((target.x - (Pinky_position.x))), 2) + pow(static_cast<float>((target.y - (Pinky_position.y - 1))), 2));
+						if (tempDistance < bestDistance) {
+							bestDistance = tempDistance;
+							newDirection = 3;
+						}
+						break;
+					}
+				}
+			}
+			if (1 < counter) {
+				direction = newDirection;
+			}
+			else {
+				if (newDirection == 4) {
+					direction = (direction + 2) % 4;
+				}
+				else {
+					direction = newDirection;
+				}
+			}
+		}
+
+
+		else { //Scared ai
+
+			unsigned short newDirection = 0;
+			for (int i = 0; i < 4; i++) {
+				if (blocked[i] == false && i != (direction + 2) % 4) {
+					if (blocked[i] == 0) {
+						counter++;
+					}
+				}
+			}
+			if (0 < counter) {
+				while ((newDirection == (direction + 2) % 4) || (blocked[newDirection] == true)) {
+					newDirection = rand() % 4;
+				}
+				direction = newDirection;
+			}
+
+		}
+	}
+}
+
+void Pinky::update(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map) {
+	if (active == true) {
+		Pposition = (*pacPointer).getPosition();
+		pinkyAI(i_map, aiType);
+		if (direction == 0) {
+			Pinky_position.x += PACMAN_SPEED;
+		}
+		else if (direction == 1) {
+			Pinky_position.y += PACMAN_SPEED;
+		}
+		else if (direction == 2) {
+			Pinky_position.x -= PACMAN_SPEED;
+		}
+		else if (direction == 3) {
+			Pinky_position.y -= PACMAN_SPEED;
+		}
+		if (Pinky_position.x >= CELL_SIZE * 20)
+		{
+			Pinky_position.x = 6;
+		}
+		else if (Pinky_position.x < 5)
+		{
+			Pinky_position.x = 319;
+		}
+		collidePacman();
+	}
+
+}
+
+void Pinky::collidePacman() {
+	float distance = sqrt(pow(static_cast<float>(Pposition.x - Pinky_position.x), 2) + pow(static_cast<float>(Pposition.y - Pinky_position.y), 2));
+	if ((*pacPointer).getPowerup() == false) {
+		if (distance < 10) {
+			(*pacPointer).die();
+			std::cout << "Pinky killed you. Game over";
+		}
+	}
+	else {
+		if (distance < 10) {
+			if (aiType != Running) {
+				(*pacPointer).increaseScore(200);
+			}
+			aiType = 3;
+
+		}
+	}
+}
+
+void Pinky::activate() {
+	active = true;
+	std::cout << "Pinky activated" << std::endl;
+	aiType = 3;
+}
+
+void Pinky::setAI(int ai) {
+	aiType = ai;
 }
 
 
@@ -73,19 +279,30 @@ void Blinky::draw(sf::RenderWindow& window)
 {
 	sf::CircleShape circle(CELL_SIZE / 2);
 	sf::RectangleShape rectangle(sf::Vector2(16.f, 7.f));
+	circle.setPosition(Blinky_position.x, Blinky_position.y);
+	rectangle.setPosition(Blinky_position.x, Blinky_position.y + CELL_SIZE / 2);
 	if ((*pacPointer).getPowerup() == true) {
+		if (aiType == 3) {
+			circle.setFillColor(sf::Color(255, 255, 255));
+			rectangle.setFillColor(sf::Color(255, 255, 255));
+		}
+		else {
+			circle.setFillColor(sf::Color(0, 0, 255));
+			rectangle.setFillColor(sf::Color(0, 0, 255));
+		}
 		
-		
-		circle.setFillColor(sf::Color(0, 0, 255));
-		circle.setPosition(Blinky_position.x, Blinky_position.y);
-		rectangle.setFillColor(sf::Color(0, 0, 255));
-		rectangle.setPosition(Blinky_position.x, Blinky_position.y + CELL_SIZE / 2);
+
 	}
 	else {
-		circle.setFillColor(sf::Color(255, 0, 0));
-		circle.setPosition(Blinky_position.x, Blinky_position.y);
-		rectangle.setFillColor(sf::Color(255, 0, 0));
-		rectangle.setPosition(Blinky_position.x, Blinky_position.y + CELL_SIZE / 2);
+		if (aiType == 3){
+			circle.setFillColor(sf::Color(255, 255, 255));
+			rectangle.setFillColor(sf::Color(255, 255, 255));
+		}
+		else {
+			circle.setFillColor(sf::Color(255, 0, 0));
+			rectangle.setFillColor(sf::Color(255, 0, 0));
+		}
+
 	}
 
 	
@@ -137,6 +354,7 @@ void Blinky::blinkyAI(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map
 	blocked[2] = collides(Wall, Blinky_position.x - PACMAN_SPEED, Blinky_position.y, i_map, false);
 	blocked[3] = collides(Wall, Blinky_position.x, Blinky_position.y - PACMAN_SPEED, i_map, false);
 	float targetDistance;
+
 	if (aiType == 0) {
 		target.x = CELL_SIZE * MAP_WIDTH;
 		target.y = 0;
@@ -145,8 +363,17 @@ void Blinky::blinkyAI(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map
 		target.x = Pposition.x;
 		target.y = Pposition.y;
 	}
+	if (aiType == 3) {
+		target.x = 160;
+		target.y = 112;
+	}
+	if (aiType == 3 && Blinky_position.x == 160 && Blinky_position.y == 112) {
+		setAI(Chase);
+		target.x = Pposition.x;
+		target.y = Pposition.y;
+	}
 
-	if ((*pacPointer).getPowerup() == false) { //Normal ai
+	if ((*pacPointer).getPowerup() == false || aiType == 3) { //Normal ai, goes to designated target
 		unsigned short newDirection = 4;
 		float tempDistance; //large number so it is guaranteed to fire
 		targetDistance = sqrt(pow(static_cast<float>((target.x - Blinky_position.x)), 2) + pow(static_cast<float>((target.y - Blinky_position.y)), 2));
@@ -231,6 +458,19 @@ void Blinky::collidePacman() {
 			std::cout << "Blinky killed you. Game over";
 		}
 	}
+	else {
+		if (distance < 10) {
+			if (aiType != Running) {
+				(*pacPointer).increaseScore(200);
+			}
+			aiType = 3;
+			
+		}
+	}
+}
+
+void Blinky::setAI(int ai) {
+	aiType = ai;
 }
 
 void Clyde::draw(sf::RenderWindow& window)

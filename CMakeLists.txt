@@ -16,6 +16,7 @@ set(SOURCES src/main.cpp
             src/Pacman.cpp
             src/Ghosts.cpp
             src/collision.cpp
+            src/Manager.cpp
 
 			
             
@@ -24,6 +25,7 @@ set(SOURCES src/main.cpp
 			header/Pacman.h
             header/Ghosts.h
             header/collision.h
+            header/Manager.h
 
 			)
 

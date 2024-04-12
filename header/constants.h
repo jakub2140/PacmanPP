@@ -12,7 +12,7 @@ constexpr unsigned int MAP_WIDTH = 21;
 constexpr unsigned int SCREEN_RESIZE = 3;
 
 constexpr unsigned int FRAME_DURATION = 10000;
-constexpr unsigned int PACMAN_SPEED = 2;
+constexpr unsigned int PACMAN_SPEED = 1;
 
 enum Cell
 {
@@ -27,7 +27,8 @@ enum AIType
 {
 	Scatter,
 	Chase,
-	Frightened
+	Frightened,
+	Running
 };
 
 struct Position {

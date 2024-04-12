@@ -120,13 +120,13 @@ std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH> convert_sketch(const std::ar
 
 			if (i_map_sketch[y][x] == '1')
 			{
-				pinky.setPosition(CELL_SIZE * x, CELL_SIZE * y);
+				inky.setPosition(CELL_SIZE * x, CELL_SIZE * y);
 
 			}
 
 			if (i_map_sketch[y][x] == '2')
 			{
-				inky.setPosition(CELL_SIZE * x, CELL_SIZE * y);
+				pinky.setPosition(CELL_SIZE * x, CELL_SIZE * y);
 
 			}
 
