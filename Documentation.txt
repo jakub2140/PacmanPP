@@ -1,0 +1,159 @@
+Code documentation:
+
+This code emulates the classic game PacMan in C++ using the SFML graphics library.
+
+Classes:
+Ghost:Parent class for all other ghosts
+
+Inky: Derived from Ghost
+Blinky: Derived from Ghost
+Pinky: Derived from Ghost
+Clyde: Derived from Ghost
+
+Pacman: Class for Pacman
+
+Manager: Class to store static functions for managing the overall game state
+
+Structs:
+Position:
+Used to store the position of any game object in two shorts, x and y
+
+Enums:
+Enumerators to convert from words to integer values to improve code readability
+Cell:
+Shows the type of each cell in the bitmap used to draw the background
+AIType:
+Shows each AI type for the ghosts.
+
+------------------------
+FUNCTION OVERVIEW:
+------------------------
+All ghost functions work similarly, and are inherited from virtual functions in the base class.
+-----
+GHOST FUNCTIONS:
+-----
+Draw:
+Ghosts are drawn as a combination of a rectangle and circle located at their respective position
+The color varies based on the game state, being blue when Pacman is powered up, white when they have been eaten and are returning to their home, and their normal colors in any other state
+Set Position(Position structure input):
+Sets the position of the ghost
+Update: 
+Runs an update on the ghost where, if they are active, they determine what direction they want to move in, move in that direction, then check if they are colliding with Pacman. If they at the end of the warp tunnel, the function warps them to the other side of it
+setAI(integer input):
+Sets the AI of the ghost to the provided integer value, unless they are in the Running State, where it saves the provided input and will set them to it once they have reached home and are able to leave the running state
+collidePacman():
+Checks if the ghost is colliding with Pacman. If they are, they call a function on Pacman to kill him if he is not powered up, or switch to the running mode and flee to their home if Pacman is powered up
+activate():
+Only present on non-Blinky ghosts. Activates the ghost and enables them to move around.
+getActive():
+returns the active status of the ghost
+Constructor(inputs: Pacman pointer, ai integer, short starting direction):
+Initializes the ghost with a pointer to Pacman, an integer reflecting their current AI value, and a short to indicate which direction they should move at the start of the game.
+EXCEPTION:
+Inky is also passed a pointer to Blinky, since he needs it for his unique targeting function
+
+------
+Ghost AI:
+------
+Each ghost checks what directions are available for it to move, and then engages in a unique targeting mechanism, dependent on what AI status they are in.
+Targeting mechanisms are provided in depth at https://gameinternals.com/understanding-pac-man-ghost-behavior. Please consult this document for a full understanding of the ghost AI.
+Overview:
+
+Chase AI: the AI type where each ghost is trying to find Pacman
+
+Blinky:
+Attempts to navigate directly to Pacman's position
+Inky: 
+Finds the vector pointing from Blinky to Pacman, then doubles its value. Inky tries to navigate to this point
+Pinky: 
+Finds the direction that Pacman is facing and the position he currently occupies, then tries to navigate a point 4 squares ahead of where he is currently traveling
+Clyde:
+If he is farther than 8 squares from Pacman, he tries to navigate to his location. If he is closer than 8 squares, he changes his target to the bottom left corner of the map.
+
+Scatter AI: Each ghost attempts to run to one of the corners of the map
+
+Running AI: The ghost attempts to run back to the square in front of the home, since it has been eaten by Pacman. Once it reaches that point, it swaps back to whichever AI state it is meant to have
+
+Frightened AI: The ghost randomly choses a direction to move at each intersection
+
+Navigation:
+Once each ghost knows which directions it can possibly move, the ghost checks to see if moving in that direction would bring it closer than Pacman. It iterates through all possible directions, and if the next
+direction it checks is closer to Pacman than the last one, it changes its preferred direction to that one. Once all directions have been checked, the ghost now knows which direction will move it closer to Pacman,
+and moves in that direction.
+NOTE: This is not a smart pathfinding algorithm. It checks the literal distance from Pacman of each potential direction. This means that the ghosts will take paths that may lead farther away from Pacman in the long run,
+since they only evaluate once at each intersection and are effectively locked in to any pathway since they can only turn around if they get stuck in a dead end.
+
+-----
+PACMAN FUNCTIONS:
+-----
+draw(open window input):
+Draws Pacman as a circle at his current position on the window. If Pacman is alive, he is drawn as yellow. If he is dead, he is drawn as red.
+Constructor Pacman():
+Pacman is initialized as alive, with no powerup, and with his score set to zero
+setPosition(position input):
+Pacman's position struct is set to the input struct
+getScore():
+returns the current score value, used in evaluating the current game state
+getPowerup(): 
+returns Pacman's current powerup status, used by the ghosts to determine whether Pacman should die or not when they hit him
+getPosition(): 
+Returns Pacman's current position, used by the ghosts to determine where he is located
+getAlive():
+Returns whether Pacman is alive or not
+setPowerup(input boolean)
+Sets Pacman's powerup state to true or false
+update(input bitmap)
+Checks to see if the player is holding any of the movement keys (WASD). If they are, then it checks to see if there is a wall in the direction that the input commanded. 
+If there is no wall in the way, then Pacman will move in that direction. Once Pacman has moved, the function then checks to see if he is colliding with a small or big pellet.
+If Pacman has collided with a small pellet, he increments his score by +10. If he collides with a large pellet, he increments his score by +50 and sets up his powerup. 
+He then creates a new thread which waits for the length of the powerup timer, then sets his powerup status to false.
+If Pacman is located at the edges of the map in the warp tunnel, the function sends him to the other side of the map.
+die():
+This function kills Pacman, setting his alive status to false. It then clears the text output prompt and sends a game over message to it which states what the score at time of death was.
+After this, it looks for Score.txt to score his high score. If it does not exist, it creates the file. It is set into append mode, and the Score.txt file will store all high scores the player achieves
+increaseScore(input integer):
+This function increases Pacman's score by the given integer. This is used by the ghosts for when they collide with Pacman while he is in powerup mode.
+getDirection:
+returns Pacman's current direction. It is used by Pinky to determine his target.
+
+-----------
+MANAGER FUNCTIONS:
+-----------
+
+powerupTimer(inputs: pointer to a Pacman object, integer):
+This function tells the current thread to sleep for the given amount of seconds, then set the powerup status of the provided Pacman pointer to false.
+ghostRelease(inputs: pointer to a Pinky, Clyde, Inky and Pacman object, and an SFML clock object):
+Determines the amount of time that has elapsed since the start of the game, and the amount of score that Pacman has. Depending on these conditions, it releases the different ghosts into the map.
+Pinky is activated if more than 5 seconds has passed
+Inky is activated if the player's score is greater than 400
+Clyde is activated if the player's score is greater than 800
+aiSwitch(pointers to all ghosts and Pacman):
+While Pacman is alive, swaps the ghosts between Scatter for 7 seconds, then Chase for 20 seconds, using sleep_for to wait.
+
+--------
+COLLISION FUNCTIONS:
+--------
+Collision(inputs: type of collision, x and y position, bitmap, boolean for whether the gate is open)
+This function determines where the x and y position would map to in the larger bitmap, then checks in each direction from the bitmap. If there is a cell which matches the provided collision
+type in any of the 4 directions, it returns true. Otherwise, it returns false.
+
+-----
+MAP CREATOR FUNCTIONS:
+-----
+
+
+-----
+MAIN FUNCTION:
+-----
+The main function creates an SFML window, creates an instance of each ghost and one instance of Pacman, then populates the screen using the bitmap creates in Map Functions.
+The game is then played until Pacman dies, with each ghost updating every frame.
+
+
+
+
+
+
+
+
+
+  
