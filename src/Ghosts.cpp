@@ -105,10 +105,10 @@ void Pinky::pinkyAI(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map, 
 			target.x = 0;
 			target.y = 0;
 		}
-		if (aiType == Chase) { //Pinky specific ai: Checks where Pacman is going, and tries to navigate to 4 squares infront of him
+		else if (aiType == Chase) { //Pinky specific ai: Checks where Pacman is going, and tries to navigate to 4 squares infront of him
 			switch (static_cast<unsigned short>((*pacPointer).getDirection())) {
 			case 0:
-				target.x = Pposition.x + 4*CELL_SIZE;
+				target.x = Pposition.x + 4 * CELL_SIZE;
 				target.y = Pposition.y;
 				break;
 			case 1:
@@ -123,12 +123,20 @@ void Pinky::pinkyAI(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map, 
 				target.x = Pposition.x;
 				target.y = Pposition.y - 4 * CELL_SIZE;
 				break;
+			case 4:
+				target.x = Pposition.x; //Catches an edge case where if Pacman doesn't immediately move Pinky can't define target.
+				target.y = Pposition.y;
+				break;
 			}
 
 		}
-		if (aiType == Running) { //Pinky navigates to the spot in front of the ghost holder
+		else if (aiType == Running) { //Pinky navigates to the spot in front of the ghost holder
 			target.x = 160;
 			target.y = 112;
+		}
+		else {
+			target.x = Pposition.x; //Catches an edge case where if somehow ai type isn't set target is still defined
+			target.y = Pposition.y;
 		}
 		if (aiType == 3 && Pinky_position.x == 160 && Pinky_position.y == 112) { //If Pinky has made it to the spot, his AI is swapped out of running
 			setAI(tempAI); //sets his AI to whatever he is supposed to be right now
@@ -370,14 +378,18 @@ void Blinky::blinkyAI(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map
 		target.x = CELL_SIZE * MAP_WIDTH;
 		target.y = 0;
 	}
-	if (aiType == 1) {
+	else if (aiType == 1) {
 		//Simplest AI, it targets whereever Pacman currently is.
 		target.x = Pposition.x;
 		target.y = Pposition.y;
 	}
-	if (aiType == 3) {
+	else if (aiType == 3) {
 		target.x = 160; 
 		target.y = 112;
+	}
+	else { //catches edge case where target not instantiated, sets a temporary target at Pacman
+		target.x = Pposition.x;
+		target.y = Pposition.y;
 	}
 	if (aiType == 3 && Blinky_position.x == 160 && Blinky_position.y == 112) {
 		setAI(tempAI);
@@ -596,7 +608,7 @@ void Clyde::clydeAI(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map, 
 			target.x = 0;
 			target.y = CELL_SIZE*MAP_HEIGHT;
 		}
-		if (aiType == 1) {
+		else if (aiType == 1) {
 			//Clydes targeting mechanism: If farther than 8 tiles from pacman, go to pacman. If closer, go to Clyde's corner of the map
 			if (sqrt(pow(static_cast<float>((Pposition.x - Clyde_position.x)), 2) + pow(static_cast<float>((Pposition.y - Clyde_position.y)), 2)) < 8*CELL_SIZE) {
 				target.x = 0;
@@ -608,9 +620,13 @@ void Clyde::clydeAI(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map, 
 			}
 		
 		}
-		if (aiType == 3) {
+		else if (aiType == 3) {
 			target.x = 160;
 			target.y = 112;
+		}
+		else {
+			target.x = Pposition.x;
+			target.y = Pposition.y;
 		}
 		if (aiType == 3 && Clyde_position.x == 160 && Clyde_position.y == 112) {
 			setAI(tempAI); //need to do this to avoid overloaded definition
@@ -820,15 +836,19 @@ void Inky::inkyAI(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map, in
 			target.x = CELL_SIZE * MAP_WIDTH;
 			target.y = CELL_SIZE * MAP_HEIGHT;
 		}
-		if (aiType == 1) {
+		else if (aiType == 1) {
 			//This is the only difference in the Inky AI: he finds a vector pointing from Blinky to Pacman, and sets his target to twice that vector
 			Bposition = (*blinkyPtr).getPosition();
 			target.x = Bposition.x + 2 * (Pposition.x - Bposition.x);
 			target.y = Bposition.y + 2 * (Pposition.y - Bposition.y);
 		}
-		if (aiType == 3) {
+		else if (aiType == 3) {
 			target.x = 160;
 			target.y = 112;
+		}
+		else {
+			target.x = Pposition.x;
+			target.y = Pposition.y;
 		}
 		if (aiType == 3 && Inky_position.x == 160 && Inky_position.y == 112) {
 			setAI(tempAI); //need to do this to avoid overloaded definition aiType
