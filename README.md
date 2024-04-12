@@ -10,3 +10,5 @@ Build instructions:
 3. the .exe can be found in the build folder
 
 High scores are stored in score.txt, which will be located in the build folder
+
+Pacman is controlled by W-A-S-D.
