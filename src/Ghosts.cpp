@@ -101,11 +101,11 @@ void Pinky::pinkyAI(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map, 
 		blocked[3] = collides(Wall, Pinky_position.x, Pinky_position.y - PACMAN_SPEED, i_map, gatePass);
 		float targetDistance;
 
-		if (aiType == 0) {
+		if (aiType == Scatter) { //during Scatter Pinky navigates to his specific corner of the map
 			target.x = 0;
 			target.y = 0;
 		}
-		if (aiType == 1) { //Pinky specific ai: Checks where Pacman is going, and tries to navigate to 4 squares infront of him
+		if (aiType == Chase) { //Pinky specific ai: Checks where Pacman is going, and tries to navigate to 4 squares infront of him
 			switch (static_cast<unsigned short>((*pacPointer).getDirection())) {
 			case 0:
 				target.x = Pposition.x + 4*CELL_SIZE;
@@ -126,34 +126,35 @@ void Pinky::pinkyAI(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map, 
 			}
 
 		}
-		if (aiType == 3) {
+		if (aiType == Running) { //Pinky navigates to the spot in front of the ghost holder
 			target.x = 160;
 			target.y = 112;
 		}
-		if (aiType == 3 && Pinky_position.x == 160 && Pinky_position.y == 112) {
-			setAI(tempAI);
+		if (aiType == 3 && Pinky_position.x == 160 && Pinky_position.y == 112) { //If Pinky has made it to the spot, his AI is swapped out of running
+			setAI(tempAI); //sets his AI to whatever he is supposed to be right now
 			gatePass = false;
-			target.x = Pposition.x;
+			target.x = Pposition.x; //sets target to Pacman temporarily, will be overridden next time the AI fires.
 			target.y = Pposition.y;
 		}
 
 		if ((*pacPointer).getPowerup() == false || aiType == 3) { //Normal ai, goes to designated target
-			unsigned short newDirection = 4;
-			float tempDistance; //large number so it is guaranteed to fire
+			unsigned short newDirection = 4; //impossible direction
+			float tempDistance; 
 			targetDistance = sqrt(pow(static_cast<float>((target.x - Pinky_position.x)), 2) + pow(static_cast<float>((target.y - Pinky_position.y)), 2));
-			float bestDistance = 480;
+			float bestDistance = 480; //larger than any actual distance
 			for (int i = 0; i < 4; i++) {
-				if ((blocked[i] == false) && !(i == (2 + direction) % 4)) { // (2+direction)%4 is backwards
+				if ((blocked[i] == false) && !(i == (2 + direction) % 4)) { // (2+direction)%4 is backwards, and ghosts should almost never turn around
 					if (newDirection == 4) {
-						newDirection = i;
+						newDirection = i; //if the direction is impossible, set it to the first unblocked direction
 					}
 					counter++;
 					switch (i) {
 					case 0:
+						//Each case checks in its direction if it would be closer to Pacman than the other cases
 						tempDistance = sqrt(pow(static_cast<float>((target.x - (Pinky_position.x + 1))), 2) + pow(static_cast<float>((target.y - (Pinky_position.y))), 2));
 						if (tempDistance < bestDistance) {
 							bestDistance = tempDistance;
-							newDirection = 0;
+							newDirection = 0; 
 						}
 						break;
 					case 1:
@@ -178,17 +179,17 @@ void Pinky::pinkyAI(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map, 
 						}
 						break;
 					}
-				}
+				}//At the end newDirection ends up being the best possible direction
 			}
-			if (1 < counter) {
+			if (1 < counter) { //If there is more than one way to go, then the ghost picks the best one
 				direction = newDirection;
 			}
 			else {
-				if (newDirection == 4) {
+				if (newDirection == 4) { //This only fires if the ghost has gotten into a corner somehow, and lets it turn around
 					direction = (direction + 2) % 4;
 				}
 				else {
-					direction = newDirection;
+					direction = newDirection; //if there's only one valid direction, new direction is going to be that direction
 				}
 			}
 		}
@@ -205,21 +206,22 @@ void Pinky::pinkyAI(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map, 
 				}
 			}
 			if (0 < counter) {
-				while ((newDirection == (direction + 2) % 4) || (blocked[newDirection] == true)) {
-					newDirection = rand() % 4;
+				while ((newDirection == (direction + 2) % 4) || (blocked[newDirection] == true)) {//checks if the random direction it is going is possible
+					newDirection = rand() % 4; //picks another random number if it isnt
 				}
-				direction = newDirection;
+				direction = newDirection;//ghost goes in the new direction
 			}
-
+			//all ghosts use rand(), so they will all pick the same direction if it fires at the same time
 		}
 	}
 }
 
 void Pinky::update(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map) {
-	if (active == true) {
-		Pposition = (*pacPointer).getPosition();
+	if (active == true) { ///checks to see if the ghost is active
+		Pposition = (*pacPointer).getPosition(); //gets Pacman's position from pointer passed to ghost
 		pinkyAI(i_map, aiType);
-		if (direction == 0) {
+		if (direction == 0) { //moves the ghost in whichever direction it picked.
+		//Unlike Pacman, the ghost will never pick a direction where it cannot move, so the collide function doesn't need to be called again
 			Pinky_position.x += PACMAN_SPEED;
 		}
 		else if (direction == 1) {
@@ -231,7 +233,7 @@ void Pinky::update(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map) {
 		else if (direction == 3) {
 			Pinky_position.y -= PACMAN_SPEED;
 		}
-		if (Pinky_position.x >= CELL_SIZE * 20)
+		if (Pinky_position.x >= CELL_SIZE * 20) //Allows the ghosts to wrap around the map and use the warp tunnels
 		{
 			Pinky_position.x = 6;
 		}
@@ -239,51 +241,51 @@ void Pinky::update(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map) {
 		{
 			Pinky_position.x = 319;
 		}
-		collidePacman();
+		collidePacman(); //checks if the ghost is colliding with Pacman
 	}
 
 }
 
 void Pinky::collidePacman() {
-	float distance = sqrt(pow(static_cast<float>(Pposition.x - Pinky_position.x), 2) + pow(static_cast<float>(Pposition.y - Pinky_position.y), 2));
-	if ((*pacPointer).getPowerup() == false) {
+	float distance = sqrt(pow(static_cast<float>(Pposition.x - Pinky_position.x), 2) + pow(static_cast<float>(Pposition.y - Pinky_position.y), 2)); //finds distance to Pacman
+	if ((*pacPointer).getPowerup() == false) { //If Pacman isn't powered up, the ghost kills him
 		if (distance < 10) {
-			(*pacPointer).die();
+			(*pacPointer).die();//calls die function on Pacman
 			std::cout << "Pinky killed you. Game over";
 		}
 	}
 	else {
-		if (distance < 10) {
-			if (aiType != Running) {
+		if (distance < 10) { //If Pacman is powered up, the ghost gets eaten instead
+			if (aiType != Running) { //Only increases the score once
 				(*pacPointer).increaseScore(200);
 			}
-			aiType = 3;
+			aiType = Running; //Switches the AI type to running away
 
 		}
 	}
 }
 
-void Pinky::activate() {
+void Pinky::activate() { //Function activates Pinky
 	active = true;
 	std::cout << "Pinky activated" << std::endl;
-	aiType = 3;
+	aiType = Running; //By setting AI to running, Pinky will navigate out of the ghost box and then swap to whatever his AI type is meant to be
 }
 
-void Pinky::setAI(int ai) {
+void Pinky::setAI(int ai) { //Sets Pinky's AI function
 	if (aiType == Running && Pinky_position.x == 160 && Pinky_position.y == 112) {
-		aiType = ai;
+		aiType = ai; //Pinky can only swap out of running by being at the right location in the map
 	}
-	else if (aiType == Running) {
-		tempAI = ai;
+	else if (aiType == Running) { //If Pinky is running, he needs to stay in this state until he gets back to the start
+		tempAI = ai; //Saves the AI he was meant to be changed to
 	}
 	else {
-		aiType = ai;
+		aiType = ai; //sets his AI normally if not in running
 	}
 }
 
 
 
-void Blinky::draw(sf::RenderWindow& window)
+void Blinky::draw(sf::RenderWindow& window) //Blinky is drawn identically to Pinky, but red
 {
 	sf::CircleShape circle(CELL_SIZE / 2);
 	sf::RectangleShape rectangle(sf::Vector2(16.f, 7.f));
@@ -327,7 +329,7 @@ void Blinky::setPosition(short int x, short int y)
 	Blinky_position = { x,y };
 }
 
-void Blinky::update(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map) {
+void Blinky::update(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map) { //Blinky's update is identical, except that he is always active
 	Pposition = (*pacPointer).getPosition();
 	blinkyAI(i_map, aiType);
 	if (direction == 0) {
@@ -355,6 +357,7 @@ void Blinky::update(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map) 
 
 void Blinky::blinkyAI(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map, int aiType) {
 	int counter = 0; //ensures that the ghost only moves if it's at an intersection
+	//AI overall is identical to Pinky, but has a different targeting function
 	Position target;
 	bool blocked[] = {0, 0, 0, 0};
 	blocked[0] = collides(Wall, Blinky_position.x + PACMAN_SPEED, Blinky_position.y, i_map, false);
@@ -363,7 +366,7 @@ void Blinky::blinkyAI(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map
 	blocked[3] = collides(Wall, Blinky_position.x, Blinky_position.y - PACMAN_SPEED, i_map, false);
 	float targetDistance;
 
-	if (aiType == 0) {
+	if (aiType == 0) { //Targets Blinky's corner
 		target.x = CELL_SIZE * MAP_WIDTH;
 		target.y = 0;
 	}
@@ -382,9 +385,9 @@ void Blinky::blinkyAI(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map
 		target.y = Pposition.y;
 	}
 
-	if ((*pacPointer).getPowerup() == false || aiType == 3) { //Normal ai, goes to designated target
+	if ((*pacPointer).getPowerup() == false || aiType == 3) { //Identical to Pinky
 		unsigned short newDirection = 4;
-		float tempDistance; //large number so it is guaranteed to fire
+		float tempDistance; 
 		targetDistance = sqrt(pow(static_cast<float>((target.x - Blinky_position.x)), 2) + pow(static_cast<float>((target.y - Blinky_position.y)), 2));
 		float bestDistance = 480;
 		for (int i = 0; i < 4; i++) {
@@ -459,7 +462,7 @@ void Blinky::blinkyAI(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map
 	}
 }
 
-void Blinky::collidePacman() {
+void Blinky::collidePacman() { //Identical to Pinky
 	float distance = sqrt(pow(static_cast<float>(Pposition.x - Blinky_position.x), 2) + pow(static_cast<float>(Pposition.y - Blinky_position.y), 2));
 	if ((*pacPointer).getPowerup() == false) {
 		if (distance < 10) {
@@ -490,11 +493,11 @@ void Blinky::setAI(int ai) {
 	}
 }
 
-Position Blinky::getPosition() {
+Position Blinky::getPosition() { //Only Blinky has this: he needs it so Inky can know where he is
 	return Blinky_position;
 }
 
-void Clyde::draw(sf::RenderWindow& window)
+void Clyde::draw(sf::RenderWindow& window) //Clyde is drawn the same as all ghosts, but orange
 {
 	sf::CircleShape circle(CELL_SIZE / 2);
 	sf::RectangleShape rectangle(sf::Vector2(16.f, 7.f));
@@ -579,7 +582,7 @@ void Clyde::update(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map) {
 	}
 }
 
-void Clyde::clydeAI(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map, int aiType) {
+void Clyde::clydeAI(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map, int aiType) { //Mostly identical to Pinky
 	if (active == true) {
 		int counter = 0; //ensures that the ghost only moves if it's at an intersection
 		Position target;
@@ -594,7 +597,7 @@ void Clyde::clydeAI(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map, 
 			target.y = CELL_SIZE*MAP_HEIGHT;
 		}
 		if (aiType == 1) {
-			//Clydes targeting mechanism: If farther than 8 tiles from pacman, go to pacman. If closer, go to his corner of the map
+			//Clydes targeting mechanism: If farther than 8 tiles from pacman, go to pacman. If closer, go to Clyde's corner of the map
 			if (sqrt(pow(static_cast<float>((Pposition.x - Clyde_position.x)), 2) + pow(static_cast<float>((Pposition.y - Clyde_position.y)), 2)) < 8*CELL_SIZE) {
 				target.x = 0;
 				target.y = CELL_SIZE * MAP_HEIGHT;
@@ -611,13 +614,13 @@ void Clyde::clydeAI(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map, 
 		}
 		if (aiType == 3 && Clyde_position.x == 160 && Clyde_position.y == 112) {
 			setAI(tempAI); //need to do this to avoid overloaded definition
-			gatePass = false;
+			gatePass = false; //Clyde can only go out of the gate once when he is first activated
 			target.x = Pposition.x;
 			target.y = Pposition.y;
 		}
 		if ((*pacPointer).getPowerup() == false || aiType == 3) { //Normal ai, goes to designated target
 			unsigned short newDirection = 4;
-			float tempDistance; //large number so it is guaranteed to fire
+			float tempDistance; 
 			targetDistance = sqrt(pow(static_cast<float>((target.x - Clyde_position.x)), 2) + pow(static_cast<float>((target.y - Clyde_position.y)), 2));
 			float bestDistance = 480;
 			for (int i = 0; i < 4; i++) {
@@ -691,7 +694,7 @@ void Clyde::clydeAI(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map, 
 	}
 }
 
-void Clyde::collidePacman() {
+void Clyde::collidePacman() { //Identical to Pinky
 	float distance = sqrt(pow(static_cast<float>(Pposition.x - Clyde_position.x), 2) + pow(static_cast<float>(Pposition.y - Clyde_position.y), 2));
 	if ((*pacPointer).getPowerup() == false) {
 		if (distance < 10) {
@@ -710,7 +713,7 @@ void Clyde::collidePacman() {
 	}
 }
 
-void Inky::draw(sf::RenderWindow& window)
+void Inky::draw(sf::RenderWindow& window) //Identical to all other ghosts, but blue-green
 {
 	sf::CircleShape circle(CELL_SIZE / 2);
 	sf::RectangleShape rectangle(sf::Vector2(16.f, 7.f));
@@ -754,12 +757,12 @@ void Inky::setPosition(short int x, short int y)
 
 void Inky::activate() {
 	active = true;
-	std::cout << "Inky active" << std::endl;
+	std::cout << "Inky active" << std::endl; //activates Inky and lets him pass through the gate
 	gatePass = true;
 	aiType = 3;
 }
 
-void Inky::setAI(int ai) {
+void Inky::setAI(int ai) { //Identical to Pinky
 	if (aiType == Running && Inky_position.x == 160 && Inky_position.y == 112) {
 		aiType = ai;
 	}
@@ -775,7 +778,7 @@ bool Inky::getActive() {
 	return active;
 }
 
-void Inky::update(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map) {
+void Inky::update(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map) { //Identical to Pinky
 	if (active == true) {
 		Pposition = (*pacPointer).getPosition();
 		inkyAI(i_map, aiType);
@@ -803,7 +806,7 @@ void Inky::update(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map) {
 	}
 }
 
-void Inky::inkyAI(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map, int aiType) {
+void Inky::inkyAI(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map, int aiType) { //Mostly identical to Pinky
 	if (active == true) {
 		int counter = 0; //ensures that the ghost only moves if it's at an intersection
 		Position target;
@@ -828,13 +831,13 @@ void Inky::inkyAI(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map, in
 			target.y = 112;
 		}
 		if (aiType == 3 && Inky_position.x == 160 && Inky_position.y == 112) {
-			setAI(tempAI); //need to do this to avoid overloaded definition
+			setAI(tempAI); //need to do this to avoid overloaded definition aiType
 			target.x = Pposition.x;
 			target.y = Pposition.y;
 		}
 		if ((*pacPointer).getPowerup() == false || aiType == 3) { //Normal ai, goes to designated target
 			unsigned short newDirection = 4;
-			float tempDistance; //large number so it is guaranteed to fire
+			float tempDistance; 
 			targetDistance = sqrt(pow(static_cast<float>((target.x - Inky_position.x)), 2) + pow(static_cast<float>((target.y - Inky_position.y)), 2));
 			float bestDistance = 480;
 			for (int i = 0; i < 4; i++) {
@@ -908,7 +911,7 @@ void Inky::inkyAI(std::array<std::array<Cell, MAP_HEIGHT>, MAP_WIDTH>& i_map, in
 	}
 }
 
-void Inky::collidePacman() {
+void Inky::collidePacman() { //Identical to other ghosts
 	float distance = sqrt(pow(static_cast<float>(Pposition.x - Inky_position.x), 2) + pow(static_cast<float>(Pposition.y - Inky_position.y), 2));
 	if ((*pacPointer).getPowerup() == false) {
 		if (distance < 10) {

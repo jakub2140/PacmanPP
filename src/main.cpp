@@ -26,7 +26,7 @@ int main()
             " #.##.#.#####.#.##.# ",
             " #....#...#...#....# ",
             " ####.###.#.### #### ",
-            "    #.#...4...#.#  . ",
+            "    #.#...4...#.#    ",
             "#####.#.##-##.#.#####",
             "     ...#123#...     ",
             "#####.#.##### #.#####",
@@ -56,7 +56,7 @@ int main()
     Clyde clyde(pacman, Chase, 2);//orange
     Inky inky(pacman, Chase, 0, &blinky);//blue
 
-    std::jthread t1(Manager::aiSwitch, &pinky, &clyde, &inky, &blinky, pacman);
+    std::jthread t1(Manager::aiSwitch, &pinky, &clyde, &inky, &blinky, pacman); //Spun off into its own thread to use sleep_for
     t1.detach();
 
     map = convert_sketch(sketch, (*pacman), pinky, blinky, clyde, inky);
@@ -89,7 +89,7 @@ int main()
 
             if (FRAME_DURATION > lag)
             {
-                if((*pacman).getAlive()) {
+                if((*pacman).getAlive()) { //only runs the game if Pacman is alive
                     window.clear();
                     draw_map(map, window);
                     Manager::ghostRelease(&pinky, &clyde, &inky, pacman, &clock);
@@ -107,7 +107,7 @@ int main()
                 }
                 else
                 {
-                    window.clear();
+                    window.clear(); //If Pacman dies it only displays Pacman and a black screen
                     (*pacman).draw(window);
                     window.display();
                 }
