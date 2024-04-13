@@ -140,7 +140,14 @@ type in any of the 4 directions, it returns true. Otherwise, it returns false.
 -----
 MAP CREATOR FUNCTIONS:
 -----
+convert_sketch(inputs: an array of strings and objects for the classes Pacman Pinky, Blinky, Inky, clyde)
+The function takes in the sketch of the map that was given in ascii symbols and goes through each individual character and converts it into different cell types depending on which character it is. 
+For the characters p, 1, 2, 3, 4 the function calls the setPosition functions of each class.  
 
+draw_map(inputs an array of Cells and the window) both inputs are passed by reference so the function can change their values
+This function takes in an array of Cells and goes through each individual cell. It then colors them depending on which cell type it is. If its a wall it colors a blue rectangle on the window.
+If cell type is Pellets it draws a small yellow circle in the spot where the cell type is equal to Pellets. If cell type is BigPellets it creates a larger red circle in the spot where the cell type is equal 
+to BigPellets. If the cell type is Empty then nothing is drawn and it stays blank on the window.  
 
 -----
 MAIN FUNCTION:
